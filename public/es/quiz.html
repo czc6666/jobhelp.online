@@ -37,7 +37,38 @@
     <!-- Turnstile Script -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script>
     <style>
-        .quiz-card, #direct-input-container { min-height: 32rem; }
+        /* Base styling for smooth transitions */
+        .quiz-card, #direct-input-container {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0) scale(1);
+            opacity: 1;
+            will-change: transform, opacity;
+            min-height: 32rem; /* Fix for jittering button */
+        }
+
+        /* Animation states */
+        .card-enter {
+            transform: translateX(100%) scale(0.9);
+            opacity: 0;
+        }
+        .card-exit {
+            transform: translateX(-100%) scale(0.9);
+            opacity: 0;
+        }
+
+        /* For the loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
