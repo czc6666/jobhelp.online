@@ -62,7 +62,23 @@
       "@type": "WebSite",
       "name": "职业指南针",
       "url": "https://jobhelp.online/",
-      "alternateName": "Career Compass"
+      "alternateName": "Career Compass",
+      "publisher": {
+        "@type": "Organization",
+        "name": "职业指南针",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://jobhelp.online/og-image.png"
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://jobhelp.online/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
     }
     </script>
     <script type="application/ld+json">
@@ -130,6 +146,7 @@
         <div class="flex items-center justify-between">
             <div class="text-xl font-bold text-gray-900">职业指南针</div>
             <div class="flex items-center">
+                <a href="https://blog.jobhelp.online" target="_blank" class="text-sm font-semibold text-gray-600 hover:text-gray-900 mr-4">博客</a>
                 <a href="quiz.html" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold apple-button mr-4 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-700">开始测试</a>
                 <!-- Language Switcher Dropdown -->
                 <div id="lang-switcher-container" class="relative">
