@@ -94,6 +94,7 @@
     <script>
         const API_URL = "/api/analyze";
         const LANG = "de";
+
         let turnstileWidgetId = null;
         let actionQueue = [];
         let isVerificationInProgress = false;
@@ -101,7 +102,7 @@
         window.onTurnstileLoad = function () {
             if (typeof turnstile !== 'undefined') {
                 turnstileWidgetId = turnstile.render('#turnstile-container', {
-                    sitekey: '0x4AAAAAABhyfTjwR6RXipd_', 
+                    sitekey: '0x4AAAAAABhyfTjwR6RXipd_',
                     callback: function(token) {
                         isVerificationInProgress = false;
                         const action = actionQueue.shift();
@@ -113,19 +114,23 @@
                     },
                     'error-callback': function() {
                         isVerificationInProgress = false;
-                        console.error('Turnstile verification failed.');
-                        alert('Die Sicherheitsüberprüfung ist fehlgeschlagen. Bitte laden Sie die Seite neu und versuchen Sie es erneut.');
+                        document.getElementById('initial-result').innerHTML = `<div class="text-red-500">Sicherheitsüberprüfung fehlgeschlagen. Bitte aktualisieren und erneut versuchen.</div>`;
+                        actionQueue = [];
                     },
-                    size: 'invisible'
+                    size: 'invisible',
                 });
             }
         };
 
-        function withTurnstileVerification(action) {
-            if (isVerificationInProgress) { return; }
+        function executeProtectedAction(action) {
             actionQueue.push(action);
-            isVerificationInProgress = true;
-            if (turnstileWidgetId) { turnstile.execute(turnstileWidgetId); }
+            if (isVerificationInProgress) { return; }
+            if (turnstileWidgetId !== null) {
+                isVerificationInProgress = true;
+                turnstile.execute(turnstileWidgetId);
+            } else {
+                document.getElementById('initial-result').innerHTML = `<div class="text-red-500">Verifizierungskomponente konnte nicht geladen werden. Bitte laden Sie die Seite neu.</div>`;
+            }
         }
 
         const questions = [
@@ -178,219 +183,277 @@
 
         let currentQuestionIndex = 0;
         const userAnswers = [];
-        const converter = new showdown.Converter({
-            simplifiedAutoLink: true,
-            strikethrough: true,
-            tables: true
-        });
+        const markdownConverter = new showdown.Converter({ simplifiedAutoLink: true, tables: true, strikethrough: true });
 
-        document.addEventListener("DOMContentLoaded", () => {
-            renderQuestion(currentQuestionIndex);
-            document.getElementById('skip-quiz-btn').addEventListener('click', showDirectInput);
-            document.getElementById('direct-input-submit-btn').addEventListener('click', handleDirectInputSubmit);
-        });
-
-        function renderQuestion(index) {
-            const quizContainer = document.getElementById('quiz-container');
-            const questionData = questions[index];
+        const viewContainer = document.getElementById('view-container');
+        const quizContainer = document.getElementById('quiz-container');
+        const skipQuizContainer = document.getElementById('skip-quiz-container');
+        const directInputContainer = document.getElementById('direct-input-container');
+        const resultsContainer = document.getElementById('results-container');
+        const additionalContent = document.getElementById('additional-content');
+        const initialResultContainer = document.getElementById('initial-result');
+        const chatWrapper = document.getElementById('chat-wrapper');
+        const chatHistory = document.getElementById('chat-history');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        
+        function renderQuestion() {
+            const cardData = questions[currentQuestionIndex];
             const card = document.createElement('div');
             card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
-            card.innerHTML = `
-                <div class="text-right text-sm text-gray-500 mb-4">Frage ${index + 1} / ${questions.length}</div>
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6">${questionData.question}</h2>
-                <div class="space-y-4">
-                    ${questionData.options.map((option, i) => `
-                        <button data-answer="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg transition">
-                            ${option}
-                        </button>
-                    `).join('')}
-                </div>`;
-
-            quizContainer.innerHTML = ''; // Clear previous card
-            quizContainer.appendChild(card);
-
-            // Add event listeners to new buttons
-            card.querySelectorAll('button[data-answer]').forEach(button => {
-                button.addEventListener('click', handleAnswer);
-            });
             
-            // Trigger animation
-            setTimeout(() => card.classList.remove('card-enter'), 10);
+            const optionsHTML = cardData.options.map(option => `
+                <div class="option border rounded-lg p-4 mb-3 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition">
+                    <span>${option}</span>
+                </div>`
+            ).join('');
+
+            card.innerHTML = `
+                <div class="text-right text-sm font-semibold text-gray-400 mb-4">${currentQuestionIndex + 1} / ${questions.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8">${cardData.question}</h2>
+                <div class="options-container">${optionsHTML}</div>
+            `;
+            
+            quizContainer.innerHTML = '';
+            quizContainer.appendChild(card);
+            requestAnimationFrame(() => card.classList.remove('card-enter'));
+            card.querySelectorAll('.option').forEach(el => el.addEventListener('click', () => handleOptionSelect(el.querySelector('span').innerText)));
         }
 
-        function handleAnswer(event) {
-            userAnswers.push(event.target.innerText);
-            const card = document.querySelector('.quiz-card');
-            
+        function handleOptionSelect(answer) {
+            userAnswers.push({ question: questions[currentQuestionIndex].question, answer: answer });
+            const card = quizContainer.querySelector('.quiz-card');
             card.classList.add('card-exit');
-            card.addEventListener('transitionend', () => {
+            
+            setTimeout(() => {
                 currentQuestionIndex++;
                 if (currentQuestionIndex < questions.length) {
-                    renderQuestion(currentQuestionIndex);
+                    renderQuestion();
                 } else {
-                    startAnalysis(userAnswers);
+                    const prompt = createQuizPrompt(JSON.stringify(userAnswers));
+                    triggerAnalysis(prompt);
                 }
-            }, { once: true });
+            }, 500);
         }
 
-        function showDirectInput() {
-            document.getElementById('quiz-container').classList.add('hidden');
-            document.getElementById('skip-quiz-container').classList.add('hidden');
-            const directInputContainer = document.getElementById('direct-input-container');
-            directInputContainer.classList.remove('hidden');
-        }
-
-        function handleDirectInputSubmit() {
-            const text = document.getElementById('direct-input-text').value.trim();
-            if (text.length < 20) {
-                alert("Für eine aussagekräftigere Analyse beschreiben Sie bitte Ihre Situation ausführlicher (mindestens 20 Zeichen).");
-                return;
-            }
-            startAnalysis(text);
-        }
-
-        function startAnalysis(data) {
-            // Hide quiz/input view and show results container
-            document.getElementById('view-container').classList.add('hidden');
-            document.getElementById('skip-quiz-container').classList.add('hidden');
-            const resultsContainer = document.getElementById('results-container');
-            resultsContainer.classList.remove('hidden');
-
-            const initialResultDiv = document.getElementById('initial-result');
-            initialResultDiv.innerHTML = `
-                <div class="spinner mx-auto mb-4"></div>
-                <h2 class="text-2xl font-bold text-gray-800">Ihr KI-Mentor denkt nach...</h2>
-                <p class="text-gray-600 mt-2">Ihre Antworten werden analysiert und Ihr beruflicher Persönlichkeitsbericht wird erstellt. Dies kann etwa 15 Sekunden dauern.</p>`;
+        function triggerAnalysis(prompt) {
+            viewContainer.style.display = 'none';
+            skipQuizContainer.style.display = 'none';
+            additionalContent.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center"><div class="spinner"></div><p class="text-gray-600 mt-4">Verifizierung wird angefordert...</p></div>`;
             
-            withTurnstileVerification((token) => {
-                fetchAnalysis(data, token, true);
+            executeProtectedAction((token) => {
+                initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center"><div class="spinner"></div><p class="text-gray-600 mt-4">Verifizierung erfolgreich. Ihre Erstanalyse wird erstellt...</p></div>`;
+                callInitialAnalysis(prompt, token);
             });
         }
+
+        function createQuizPrompt(userChoices) {
+            return `Sie sind ein erstklassiger KI-Karriereberater namens "Karriere-Kompass". Der Benutzer hat den Fragebogen ausgefüllt. Hier sind seine Antworten:
+            ---
+            ${userChoices}
+            ---
+            Bitte geben Sie Ihre Analyse streng im folgenden JSON-Format zurück.
+            Wichtige Regel: Ihre gesamte Antwort muss ein einziges, rohes JSON-Objekt sein, das direkt von JSON.parse() verarbeitet werden kann. Innerhalb von JSON-Zeichenkettenwerten müssen alle doppelten Anführungszeichen (") mit einem Backslash (\\) maskiert werden, z.B. "Er sagte \\"Hallo Welt\\"".
+            {
+              "archetype_title": "Ein prägnanter, ansprechender Archetyp-Titel, z.B. Der Risikokontrolleur",
+              "archetype_summary": "Eine Ein-Satz-Zusammenfassung, die die Kernmerkmale dieses Archetyps anschaulich erfasst.",
+              "job_suggestions": ["Nennen Sie die 3 am besten passenden Karrierewege basierend auf der Analyse (Array von Strings)"],
+              "full_report": "Dies ist der vollständige, detaillierte Analysebericht, bitte verwenden Sie das Markdown-Format. Der Bericht sollte enthalten: 1. Eine tiefere Interpretation des Archetyps. 2. Eine detaillierte Analyse seiner Werte und Motivationen. 3. Eine detaillierte Erläuterung der 3 empfohlenen Karrierewege. 4. Einen ermutigenden Abschluss und eine Aufforderung zu Folgefragen."
+            }`;
+        }
+
+        function createDirectInputPrompt(userInput) {
+            return `Sie sind ein erstklassiger KI-Karriereberater namens "Karriere-Kompass". Ein Benutzer hat ein direktes Gespräch initiiert. Hier ist seine Eingabe:
+            ---
+            ${userInput}
+            ---
+            Bitte geben Sie Ihre Analyse streng im folgenden JSON-Format zurück.
+            Wichtige Regel: Ihre gesamte Antwort muss ein einziges, rohes JSON-Objekt sein, das direkt von JSON.parse() verarbeitet werden kann. Innerhalb von JSON-Zeichenkettenwerten müssen alle doppelten Anführungszeichen (") mit einem Backslash (\\) maskiert werden, z.B. "Er sagte \\"Hallo Welt\\"".
+            {
+              "archetype_title": "Ein prägnanter, ansprechender Archetyp-Titel",
+              "archetype_summary": "Eine Ein-Satz-Zusammenfassung, die die Kernmerkmale des Benutzers anschaulich erfasst.",
+              "job_suggestions": ["Nennen Sie die 3 am besten passenden Karrierewege basierend auf der Analyse (Array von Strings)"],
+              "full_report": "Dies ist der vollständige, detaillierte Analysebericht, bitte verwenden Sie das Markdown-Format. Der Bericht sollte enthalten: 1. Eine tiefe Interpretation der Selbstbeschreibung des Benutzers. 2. Aufdeckung potenzieller Werte und Motivationen. 3. Eine detaillierte Erläuterung der 3 empfohlenen Karrierewege. 4. Einen ermutigenden Abschluss und eine Aufforderung zu Folgefragen."
+            }`;
+        }
+
+        let fullReport = '';
+        let conversationHistory = [];
+
+        async function callInitialAnalysis(prompt, turnstileToken) {
+             try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: "qwen/qwen3-8b:free",
+                        messages: [{ role: "user", content: prompt }],
+                        stream: false,
+                        turnstileToken: turnstileToken
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`API-Aufruf fehlgeschlagen: ${response.status}. ${errorBody}`);
+                }
+
+                const result = await response.json();
+                const analysis = JSON.parse(result.choices[0].message.content);
+
+                fullReport = analysis.full_report.replace(/\\"/g, '"');
+                let suggestionsHTML = '';
+                if (analysis.job_suggestions && analysis.job_suggestions.length > 0) {
+                    suggestionsHTML = `
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <p class="text-sm font-semibold text-gray-500 mb-4">Empfohlene Karrierewege für Sie:</p>
+                            <div class="flex flex-wrap justify-center gap-3">
+                                ${analysis.job_suggestions.map(job => `<span class="bg-gray-100 text-gray-800 text-sm font-medium px-4 py-2 rounded-full">${job.replace(/\\"/g, '"')}</span>`).join('')}
+                            </div>
+                        </div>`;
+                }
+
+                initialResultContainer.innerHTML = `
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-blue-600 mb-3">${analysis.archetype_title.replace(/\\"/g, '"')}</h2>
+                    <p class="text-lg text-gray-700 max-w-2xl mx-auto">${analysis.archetype_summary.replace(/\\"/g, '"')}</p>
+                    ${suggestionsHTML}
+                    <button id="show-full-report-btn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-10">
+                        Vollständige Analyse ansehen & Chat starten
+                    </button>
+                `;
+
+                document.getElementById('show-full-report-btn').addEventListener('click', showFullReportAndChat);
+
+            } catch (error) {
+                initialResultContainer.innerHTML = `<div class="text-red-500">Entschuldigung, bei der Analyse ist ein Fehler aufgetreten: ${error.message}</div>`;
+            }
+        }
         
-        let fullReport = "";
+        function showFullReportAndChat() {
+            document.getElementById('initial-result').style.display = 'none';
+            chatWrapper.style.display = 'block';
+            const reportHtml = markdownConverter.makeHtml(fullReport);
+            chatHistory.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
+            conversationHistory = [
+                { role: "user", content: "Dies ist mein Umfrageergebnis, bitte beginnen Sie die Analyse:" + JSON.stringify(userAnswers) },
+                { role: "assistant", content: fullReport }
+            ];
+        }
 
-        function fetchAnalysis(data, token, isInitialAnalysis) {
-            const prompt = isInitialAnalysis ? 
-                (Array.isArray(data) ? `Hier sind meine Antworten auf das Quiz: ${data.join(', ')}` : data) :
-                `Bisheriger Gesprächskontext: "${fullReport}"\n\nMeine neue Frage: "${data}"`;
+        async function callLLM(messages, turnstileToken) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: "qwen/qwen3-8b:free",
+                        messages: messages,
+                        stream: true,
+                        turnstileToken: turnstileToken
+                    }),
+                });
 
-            let accumulatedContent = "";
-            
-            fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt, lang: LANG, turnstileToken: token })
-            })
-            .then(response => {
-                if (!response.body) throw new Error('ReadableStream not available.');
+                if (!response.ok) throw new Error(`API-Aufruf fehlgeschlagen: ${response.status}. ${await response.text()}`);
+                
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
+                let buffer = '';
+                let botMessageContent = '';
                 
-                const targetDiv = isInitialAnalysis ? document.getElementById('initial-result') : null;
-                const chatHistoryDiv = isInitialAnalysis ? null : document.getElementById('chat-history');
-                let aiMessageContainer;
+                const botMessageContainer = document.createElement('div');
+                botMessageContainer.className = "flex justify-start mb-3";
+                botMessageContainer.innerHTML = `<div class="bg-gray-100 rounded-lg py-2 px-4 max-w-lg prose"></div>`;
+                chatHistory.appendChild(botMessageContainer);
+                const contentElement = botMessageContainer.querySelector('div');
 
-                if (chatHistoryDiv) {
-                    aiMessageContainer = document.createElement('div');
-                    aiMessageContainer.className = 'mb-4';
-                    aiMessageContainer.innerHTML = '<div class="font-bold text-gray-800 mb-1">KI-Mentor</div><div class="bg-gray-100 p-3 rounded-lg"></div>';
-                    chatHistoryDiv.appendChild(aiMessageContainer);
-                }
-
-                function push() {
-                    reader.read().then(({ done, value }) => {
-                        if (done) {
-                            if (isInitialAnalysis) {
-                                fullReport = accumulatedContent; // Store the full initial report
-                                showChatInterface();
-                            } else {
-                                fullReport += `\n\nBenutzerfrage: ${data}\nKI-Antwort: ${accumulatedContent}`; // Append follow-up to context
-                            }
-                            enableChatInput();
-                            return;
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); 
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const content = line.substring(6);
+                            if (content === '[DONE]') continue;
+                            try {
+                                const chunk = JSON.parse(content);
+                                if (chunk.choices[0].delta.content) {
+                                    botMessageContent += chunk.choices[0].delta.content;
+                                    contentElement.innerHTML = markdownConverter.makeHtml(botMessageContent);
+                                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                                }
+                            } catch (e) { console.error('Fehler beim Parsen des Stream-Chunks:', e); }
                         }
-                        accumulatedContent += decoder.decode(value, { stream: true });
-                        const htmlContent = converter.makeHtml(accumulatedContent);
-                        
-                        if (targetDiv) {
-                            targetDiv.innerHTML = htmlContent;
-                        } else if (aiMessageContainer) {
-                            aiMessageContainer.querySelector('.bg-gray-100').innerHTML = htmlContent;
-                            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
-                        }
-
-                        push();
-                    }).catch(error => {
-                        console.error('Streaming error:', error);
-                        const errorMsg = "<p class='text-red-500'>Entschuldigung, bei der Kommunikation mit der KI ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.</p>";
-                        if (targetDiv) targetDiv.innerHTML = errorMsg;
-                        if (aiMessageContainer) aiMessageContainer.innerHTML = errorMsg;
-                        enableChatInput();
-                    });
+                    }
                 }
-                push();
-            })
-            .catch(err => {
-                console.error('Fetch error:', err);
-                const errorMsg = "<p class='text-red-500'>Entschuldigung, ein Netzwerkfehler ist aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</p>";
-                if (isInitialAnalysis) {
-                    document.getElementById('initial-result').innerHTML = errorMsg;
-                }
-                 enableChatInput();
-            });
-        }
-
-        function showChatInterface() {
-            document.getElementById('chat-history').innerHTML = `
-                <div class="mb-4">
-                    <div class="font-bold text-gray-800 mb-1">Vollständiger KI-Bericht</div>
-                    <div class="bg-gray-100 p-3 rounded-lg">${converter.makeHtml(fullReport)}</div>
-                </div>`;
-            document.getElementById('chat-wrapper').classList.remove('hidden');
-            document.getElementById('chat-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    document.getElementById('send-btn').click();
-                }
-            });
-            document.getElementById('send-btn').addEventListener('click', handleSendMessage);
-            enableChatInput();
-        }
-
-        function handleSendMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            disableChatInput();
-            
-            const chatHistory = document.getElementById('chat-history');
-            chatHistory.innerHTML += `
-                <div class="mb-4 text-right">
-                    <div class="font-bold text-blue-600 mb-1">Sie</div>
-                    <div class="bg-blue-100 inline-block p-3 rounded-lg">${message}</div>
-                </div>`;
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-
-            input.value = '';
-
-            withTurnstileVerification((token) => {
-                fetchAnalysis(message, token, false);
-            });
+                conversationHistory.push({ role: "assistant", content: botMessageContent });
+            } catch (error) {
+                const errorElement = document.createElement('div');
+                errorElement.className = 'text-red-500';
+                errorElement.textContent = `Entschuldigung, ein Fehler ist aufgetreten: ${error.message}`;
+                chatHistory.appendChild(errorElement);
+            } finally {
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.focus();
+                if (turnstileWidgetId) turnstile.reset(turnstileWidgetId);
+            }
         }
         
-        function disableChatInput() {
-            document.getElementById('chat-input').disabled = true;
-            document.getElementById('send-btn').disabled = true;
-            document.getElementById('send-btn').innerHTML = '<div class="spinner mx-auto" style="width: 24px; height: 24px; border-width: 3px;"></div>';
+        async function handleSendMessage() {
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
+
+            const userMessageHTML = `<div class="flex justify-end mb-3"><div class="bg-blue-500 text-white rounded-lg py-2 px-4 max-w-lg">${messageText}</div></div>`;
+            chatHistory.innerHTML += userMessageHTML;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            chatInput.value = '';
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
+
+            const systemInstruction = `Regel: Sie sind ein KI-Karrierementor namens "Karriere-Kompass". Ihre Antworten müssen kurz sein (versuchen Sie, unter drei Sätzen zu bleiben, verwenden Sie oft Listen) und sich immer um Karriereplanung, Kompetenzerwerb, Ratschläge zur Jobsuche usw. drehen. Wenn der Benutzer eine nicht verwandte Frage stellt (z. B. "Wie ist das Wetter?", "Erzählen Sie einen Witz"), müssen Sie höflich ablehnen und ihn zu Karrierethemen zurückführen.`;
+            const messagesForAPI = [...conversationHistory, { role: 'system', content: systemInstruction }, { role: 'user', content: messageText }];
+            
+            executeProtectedAction((token) => {
+                conversationHistory.push({ role: 'user', content: messageText });
+                callLLM(messagesForAPI, token);
+            });
         }
 
-        function enableChatInput() {
-            document.getElementById('chat-input').disabled = false;
-            document.getElementById('send-btn').disabled = false;
-            document.getElementById('send-btn').innerHTML = '&rarr;';
+        function setupEventListeners() {
+            document.getElementById('skip-quiz-btn').addEventListener('click', () => {
+                const card = quizContainer.querySelector('.quiz-card');
+                if (card) card.classList.add('card-exit');
+                setTimeout(() => {
+                    quizContainer.style.display = 'none';
+                    directInputContainer.classList.remove('hidden');
+                    directInputContainer.classList.add('card-enter');
+                    requestAnimationFrame(() => directInputContainer.classList.remove('card-enter'));
+                }, 500);
+            });
+
+            document.getElementById('direct-input-submit-btn').addEventListener('click', () => {
+                const userInput = document.getElementById('direct-input-text').value;
+                if (userInput.trim().length < 20) {
+                    alert('Für eine genauere Analyse geben Sie bitte mindestens 20 Zeichen ein.');
+                    return;
+                }
+                const prompt = createDirectInputPrompt(userInput);
+                triggerAnalysis(prompt);
+            });
+
+            sendBtn.addEventListener('click', handleSendMessage);
+            chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage()));
         }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuestion();
+            setupEventListeners();
+        });
+        
     </script>
 </body>
 </html> 
