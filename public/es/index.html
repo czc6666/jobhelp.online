@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO: Website Title -->
+    <title>Brújula Profesional | Socio de Planificación de Carrera Impulsado por IA</title>
+    <!-- SEO: Website Description -->
+    <meta name="description" content="A través de 5 sencillas preguntas, deja que la IA analice en profundidad tu personalidad profesional, identifique tu dirección y comience una consulta de carrera uno a uno.">
+    <!-- SEO: Keywords -->
+    <meta name="keywords" content="planificación de carrera, test de carrera, IA, trayectoria profesional, análisis de personalidad, consejos laborales, Brújula Profesional">
+    <!-- SEO: Robots -->
+    <meta name="robots" content="index, follow">
+    <!-- SEO: Canonical URL -->
+    <link rel="canonical" href="https://jobhelp.online/es/">
+
+    <!-- Hreflang tags for multilingual SEO -->
+    <link rel="alternate" hreflang="zh" href="https://jobhelp.online/">
+    <link rel="alternate" hreflang="en" href="https://jobhelp.online/en/">
+    <link rel="alternate" hreflang="es" href="https://jobhelp.online/es/">
+    <link rel="alternate" hreflang="de" href="https://jobhelp.online/de/">
+    <link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/">
+    <link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/">
+    <link rel="alternate" hreflang="x-default" href="https://jobhelp.online/">
+
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Brújula Profesional",
+      "url": "https://jobhelp.online/es/",
+      "alternateName": "职业指南针"
+    }
+    </script>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jobhelp.online/es/">
+    <meta property="og:title" content="Brújula Profesional | Socio de Planificación de Carrera Impulsado por IA">
+    <meta property="og:description" content="A través de 5 sencillas preguntas, deja que la IA analice en profundidad tu personalidad profesional y identifique tu dirección.">
+    <meta property="og:image" content="https://jobhelp.online/og-image.png">
+    <meta property="og:site_name" content="Brújula Profesional">
+    <meta property="og:locale" content="es_ES">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://jobhelp.online/es/">
+    <meta name="twitter:title" content="Brújula Profesional | Socio de Planificación de Carrera Impulsado por IA">
+    <meta name="twitter:description" content="A través de 5 sencillas preguntas, deja que la IA analice en profundidad tu personalidad profesional y identifique tu dirección.">
+    <meta name="twitter:image" content="https://jobhelp.online/og-image.png">
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Styles for Apple-like aesthetic -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .apple-button {
+            transition: all 0.3s ease;
+        }
+        .apple-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <!-- Preload Turnstile script for faster loading on quiz page -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="text-xl font-bold text-gray-900">Brújula Profesional</div>
+            <div class="flex items-center">
+                <a href="quiz.html" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold apple-button mr-4 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-700">Iniciar Prueba</a>
+                <!-- Language Switcher Dropdown -->
+                <div id="lang-switcher-container" class="relative">
+                    <button id="lang-switcher-button" class="flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300">
+                        <span>Idioma (Español)</span>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="lang-switcher-menu" class="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg hidden z-10">
+                        <a href="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">中文</a>
+                        <a href="/en/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">English</a>
+                        <a href="/de/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Deutsch</a>
+                        <a href="/fr/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Français</a>
+                        <a href="/ja/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">日本語</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="text-center py-20 md:py-32">
+            <div class="container mx-auto px-6">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
+                    Deja la Confusión, Deja que la IA Ilumine tu Carrera
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                    A través de 5 sencillas preguntas, deja que la IA analice en profundidad tu personalidad profesional, identifique tu dirección y comience una consulta de carrera uno a uno.
+                </p>
+                <a href="/es/quiz.html" class="bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-lg inline-block apple-button hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+                    Comenzar Análisis Gratuito &rarr;
+                </a>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                    Encuentra tu Carrera Ideal en Solo Tres Pasos
+                </h2>
+                <div class="grid md:grid-cols-3 gap-10 text-center">
+                    <div class="p-4">
+                        <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
+                        <h3 class="text-xl font-semibold mb-2">Completa el Cuestionario Rápido</h3>
+                        <p class="text-gray-600">Responde 5 preguntas psicológicas diseñadas para entender tus motivaciones principales.</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
+                        <h3 class="text-xl font-semibold mb-2">Obtén tu Informe de IA al Instante</h3>
+                        <p class="text-gray-600">Recibe un informe de análisis de carrera profundo, personalizado para ti por un modelo de lenguaje avanzado.</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div>
+                        <h3 class="text-xl font-semibold mb-2">Inicia una Conversación Profunda</h3>
+                        <p class="text-gray-600">¿Tienes preguntas sobre el informe? Consulta a tu mentor de IA para obtener consejos de carrera ilimitados.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-16">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                    Más que un Test, es tu Asesor de Carrera Personal
+                </h2>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Análisis Hiper-personalizado</h3>
+                            <p class="text-gray-600">Olvida las conclusiones genéricas. Nuestra IA trata cada una de tus respuestas como un punto de dato único para generar resultados que son verdaderamente tuyos.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Seguimiento Ilimitado, Exploración Profunda</h3>
+                            <p class="text-gray-600">Un informe no es suficiente. Puedes hacer preguntas continuamente sobre cualquier duda profesional, como con un asesor real, para explorar todas las posibilidades.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Basado en las Últimas Tendencias del Mercado</h3>
+                            <p class="text-gray-600">El mentor de IA conoce las últimas dinámicas de la industria y las profesiones emergentes para ofrecerte consejos actualizados y con visión de futuro.</p>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=2070" alt="Un profesional trabajando en una oficina moderna" class="rounded-lg shadow-xl">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-10">Mira Cómo Encontraron su Dirección</h2>
+                <div class="max-w-5xl mx-auto">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-gray-50 p-6 rounded-xl">
+                            <blockquote class="text-gray-600">
+                                <p>"Siempre pensé que mi personalidad introvertida no encajaba con mi especialidad en marketing. Después de hablar con el mentor de IA, me ayudó a identificar el rol de 'Analista de Datos (Marketing)', que utiliza mis conocimientos profesionales sin requerir demasiada interacción social. ¡Es perfecto para mí!"</p>
+                            </blockquote>
+                            <p class="mt-4 font-semibold text-gray-900">- Lucía, estudiante de tercer año</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-xl">
+                            <blockquote class="text-gray-600">
+                                <p>"Después de trabajar tres años, sentía que repetía lo mismo todos los días y había perdido la pasión. A través de 'Brújula Profesional', descubrí que mis motivadores principales son la 'creatividad' y la 'autonomía'. Ahora estoy aprendiendo a desarrollar mi propio pequeño producto en mi tiempo libre, y la vida vuelve a tener sentido."</p>
+                            </blockquote>
+                            <p class="mt-4 font-semibold text-gray-900">- Sra. García, joven profesional</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action / Feedback Section -->
+        <section id="feedback" class="py-20">
+             <div class="container mx-auto px-6 text-center">
+                 <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">¿Listo para Iniciar tu Viaje de Exploración Profesional?</h2>
+                 <p class="text-gray-600 mb-8 max-w-2xl mx-auto">O, si tienes alguna sugerencia o comentario, nos encantaría escucharte. Nos ayuda a mejorar nuestro producto.</p>
+                 <div class="flex justify-center items-center gap-4">
+                     <a href="/es/quiz.html" class="bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-lg inline-block apple-button hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+                        Comenzar Análisis Gratuito &rarr;
+                    </a>
+                    <a href="mailto:feedback@jobhelp.online" class="bg-gray-900 text-white font-semibold py-3 px-6 rounded-full text-base inline-block apple-button hover:bg-gray-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-700">
+                        Contáctanos
+                    </a>
+                 </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-600">
+            <p>&copy; 2025 Brújula Profesional. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcherContainer = document.getElementById('lang-switcher-container');
+            const switcherButton = document.getElementById('lang-switcher-button');
+            const switcherMenu = document.getElementById('lang-switcher-menu');
+
+            if (switcherButton) {
+                switcherButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    switcherMenu.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!switcherContainer.contains(event.target)) {
+                        switcherMenu.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO: Website Title -->
+    <title>Karriere-Kompass | KI-gestützter Partner für Ihre Karriereplanung</title>
+    <!-- SEO: Website Description -->
+    <meta name="description" content="Beantworten Sie 5 einfache Fragen und lassen Sie die KI Ihre berufliche Persönlichkeit tiefgehend analysieren, Ihre Richtung bestimmen und eine persönliche Beratung starten.">
+    <!-- SEO: Keywords -->
+    <meta name="keywords" content="Karriereplanung, Karrieretest, KI, beruflicher Werdegang, Persönlichkeitsanalyse, Berufsberatung, Karriere-Kompass">
+    <!-- SEO: Robots -->
+    <meta name="robots" content="index, follow">
+    <!-- SEO: Canonical URL -->
+    <link rel="canonical" href="https://jobhelp.online/de/">
+
+    <!-- Hreflang tags for multilingual SEO -->
+    <link rel="alternate" hreflang="zh" href="https://jobhelp.online/">
+    <link rel="alternate" hreflang="en" href="https://jobhelp.online/en/">
+    <link rel="alternate" hreflang="es" href="https://jobhelp.online/es/">
+    <link rel="alternate" hreflang="de" href="https://jobhelp.online/de/">
+    <link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/">
+    <link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/">
+    <link rel="alternate" hreflang="x-default" href="https://jobhelp.online/">
+
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Karriere-Kompass",
+      "url": "https://jobhelp.online/de/",
+      "alternateName": "职业指南针"
+    }
+    </script>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jobhelp.online/de/">
+    <meta property="og:title" content="Karriere-Kompass | KI-gestützter Partner für Ihre Karriereplanung">
+    <meta property="og:description" content="Beantworten Sie 5 einfache Fragen und lassen Sie die KI Ihre berufliche Persönlichkeit tiefgehend analysieren.">
+    <meta property="og:image" content="https://jobhelp.online/og-image.png">
+    <meta property="og:site_name" content="Karriere-Kompass">
+    <meta property="og:locale" content="de_DE">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://jobhelp.online/de/">
+    <meta name="twitter:title" content="Karriere-Kompass | KI-gestützter Partner für Ihre Karriereplanung">
+    <meta name="twitter:description" content="Beantworten Sie 5 einfache Fragen und lassen Sie die KI Ihre berufliche Persönlichkeit tiefgehend analysieren.">
+    <meta name="twitter:image" content="https://jobhelp.online/og-image.png">
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        .apple-button { transition: all 0.3s ease; }
+        .apple-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+    </style>
+    <!-- Preload Turnstile script -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="text-xl font-bold text-gray-900">Karriere-Kompass</div>
+            <div class="flex items-center">
+                <a href="quiz.html" class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold apple-button mr-4 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-700">Test starten</a>
+                <!-- Language Switcher Dropdown -->
+                <div id="lang-switcher-container" class="relative">
+                    <button id="lang-switcher-button" class="flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300">
+                        <span>Sprache (Deutsch)</span>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="lang-switcher-menu" class="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg hidden z-10">
+                        <a href="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">中文</a>
+                        <a href="/en/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">English</a>
+                        <a href="/es/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-ray-100">Español</a>
+                        <a href="/fr/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Français</a>
+                        <a href="/ja/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">日本語</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="text-center py-20 md:py-32">
+            <div class="container mx-auto px-6">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
+                    Schluss mit der Unsicherheit, lassen Sie die KI Ihren Karriereweg erhellen
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                    Beantworten Sie 5 einfache Fragen und lassen Sie die KI Ihre berufliche Persönlichkeit tiefgehend analysieren, Ihre Richtung bestimmen und eine persönliche Beratung starten.
+                </p>
+                <a href="/de/quiz.html" class="bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-lg inline-block apple-button hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+                    Kostenlose Analyse starten &rarr;
+                </a>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                    Finden Sie Ihre ideale Karriere in nur drei Schritten
+                </h2>
+                <div class="grid md:grid-cols-3 gap-10 text-center">
+                    <div class="p-4">
+                        <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">1</div>
+                        <h3 class="text-xl font-semibold mb-2">Füllen Sie das Kurz-Quiz aus</h3>
+                        <p class="text-gray-600">Beantworten Sie 5 psychologische Fragen, um uns Ihre Kernmotivationen zu vermitteln.</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
+                        <h3 class="text-xl font-semibold mb-2">Erhalten Sie Ihren Sofort-KI-Bericht</h3>
+                        <p class="text-gray-600">Sie erhalten einen tiefgehenden, auf Sie zugeschnittenen Karriereanalysebericht von einem fortschrittlichen Sprachmodell.</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="bg-blue-100 text-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">3</div>
+                        <h3 class="text-xl font-semibold mb-2">Starten Sie ein tiefes Gespräch</h3>
+                        <p class="text-gray-600">Fragen zum Bericht? Stellen Sie Ihrem KI-Mentor unbegrenzt Fragen für professionellen Rat.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-16">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                    Mehr als ein Test, Ihr persönlicher Karriereberater
+                </h2>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Hyper-personalisierte Analyse</h3>
+                            <p class="text-gray-600">Vergessen Sie Standardantworten. Unsere KI behandelt jede Ihrer Antworten als einzigartigen Datenpunkt, um Ergebnisse zu generieren, die wirklich zu Ihnen passen.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Unbegrenzte Nachfragen, tiefe Erkundung</h3>
+                            <p class="text-gray-600">Ein Bericht ist nicht genug. Sie können kontinuierlich Fragen zu jeder beruflichen Unklarheit stellen, genau wie bei einem echten Berater.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Basierend auf neuesten Markttrends</h3>
+                            <p class="text-gray-600">Der KI-Mentor kennt die neuesten Branchendynamiken und aufstrebenden Berufe, um Ihnen zukunftsweisende Ratschläge zu geben.</p>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=2070" alt="Ein Profi arbeitet in einem modernen Büro" class="rounded-lg shadow-xl">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action / Feedback Section -->
+        <section id="feedback" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold mb-2 text-gray-900">Bereit für den nächsten Schritt?</h2>
+                <p class="text-gray-600 mb-8 max-w-2xl mx-auto">Oder haben Sie Anregungen oder Feedback? Wir würden uns freuen, von Ihnen zu hören, um unser Produkt zu verbessern.</p>
+                 <div class="flex justify-center items-center gap-4">
+                     <a href="/de/quiz.html" class="bg-blue-600 text-white font-bold py-4 px-8 rounded-full text-lg inline-block apple-button hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
+                        Kostenlose Analyse starten &rarr;
+                    </a>
+                    <a href="mailto:feedback@jobhelp.online" class="bg-gray-900 text-white font-semibold py-3 px-6 rounded-full text-base inline-block apple-button hover:bg-gray-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-700">
+                        Kontakt
+                    </a>
+                 </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-600">
+            <p>&copy; 2025 Karriere-Kompass. Alle Rechte vorbehalten.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const switcherContainer = document.getElementById('lang-switcher-container');
+            const switcherButton = document.getElementById('lang-switcher-button');
+            const switcherMenu = document.getElementById('lang-switcher-menu');
+
+            if (switcherButton) {
+                switcherButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    switcherMenu.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!switcherContainer.contains(event.target)) {
+                        switcherMenu.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Test | Career Compass</title>
+    <meta name="description" content="Answer 5 carefully designed questions to instantly get an AI-generated deep career personality analysis report and begin your career exploration journey.">
+    <meta name="keywords" content="career test, personality analysis, AI career advisor, career direction, Career Compass, online quiz">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jobhelp.online/en/quiz.html">
+
+    <!-- Hreflang for SEO -->
+    <link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html">
+    <link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html">
+    <link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html">
+    <link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html">
+    <link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jobhelp.online/en/quiz.html">
+    <meta property="og:title" content="Start Test | Career Compass">
+    <meta property="og:description" content="Answer 5 carefully designed questions to instantly get an AI-generated deep career personality analysis report.">
+    <meta property="og:image" content="https://jobhelp.online/og-image.png">
+    <meta property="og:site_name" content="Career Compass">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://jobhelp.online/en/quiz.html">
+    <meta name="twitter:title" content="Start Test | Career Compass">
+    <meta name="twitter:description" content="Answer 5 carefully designed questions to instantly get an AI-generated deep career personality analysis report.">
+    <meta name="twitter:image" content="https://jobhelp.online/og-image.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <!-- Turnstile Script -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script>
+    <style>
+        /* Base styling for smooth transitions */
+        .quiz-card, #direct-input-container {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0) scale(1);
+            opacity: 1;
+            will-change: transform, opacity;
+            min-height: 32rem; /* Fix for jittering button */
+        }
+
+        /* Animation states */
+        .card-enter {
+            transform: translateX(100%) scale(0.9);
+            opacity: 0;
+        }
+        .card-exit {
+            transform: translateX(-100%) scale(0.9);
+            opacity: 0;
+        }
+
+        /* For the loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "Is this test and analysis free?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, it's completely free. We are committed to helping more people who are confused about their future through AI technology. Some of the models we use are provided with free quotas by platforms like OpenRouter, allowing us to pass this value on to you."
+            }
+        }, {
+            "@type": "Question",
+            "name": "Is my data and personal information secure?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We take your privacy very seriously. Your answers and conversations with the AI are anonymous and are only used for the current analysis and dialogue. We do not store or use them for any other purpose."
+            }
+        }]
+    }
+    </script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/en/" class="text-xl font-bold text-gray-900">Career Compass</a>
+            <a href="/en/" class="text-sm font-semibold text-gray-600 hover:text-blue-600">
+                &larr; Back to Home
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4">
+        <div id="view-container" class="w-full max-w-2xl mx-auto">
+            <!-- Quiz Container -->
+            <div id="quiz-container">
+                <!-- This div will hold the actively transitioning cards -->
+            </div>
+
+            <!-- Direct Input Container (hidden by default) -->
+            <div id="direct-input-container" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Talk Directly to the AI Mentor</h2>
+                <p class="text-gray-600 mb-6">Enter your concerns, thoughts, or a self-introduction below, and the AI will generate a personalized career planning report for you.</p>
+                <textarea id="direct-input-text" rows="8" placeholder="e.g., I'm a junior majoring in marketing, but I feel I'm introverted and don't enjoy socializing. I'm confused about my future and don't know what I can do..." class="w-full border rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                <button id="direct-input-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-6">
+                    Let AI Analyze for Me
+                </button>
+            </div>
+        </div>
+
+        <!-- Skip Quiz Link -->
+        <div id="skip-quiz-container" class="text-center mt-6">
+            <button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">
+                Don't want to answer questions? Input your thoughts directly &rarr;
+            </button>
+        </div>
+
+        <!-- Results/Chat Container -->
+        <div id="results-container" class="w-full max-w-3xl mx-auto hidden">
+            <div id="initial-result" class="text-center bg-white rounded-xl shadow-lg p-6 md:p-10">
+                <!-- Initial summary will be injected here -->
+            </div>
+
+            <div id="chat-wrapper" class="hidden mt-6 bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">In-depth Conversation with AI Mentor</h2>
+                <div id="chat-history" class="h-[50vh] overflow-y-auto pr-4 mb-4 border-b">
+                    <!-- Full report and chat history will appear here -->
+                </div>
+                <div id="chat-input-container" class="flex items-center pt-4">
+                    <input type="text" id="chat-input" placeholder="Have other questions? Enter here..." class="flex-grow border rounded-l-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="send-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-r-lg hover:bg-blue-700 transition">&rarr;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Content Section -->
+        <section id="additional-content" class="w-full mt-16 mb-16">
+            <div class="container mx-auto px-6">
+                
+                <!-- Usage Examples -->
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">See How They Found Their Direction</h2>
+                    <div class="max-w-5xl mx-auto">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="bg-white p-6 rounded-xl shadow-lg">
+                                <blockquote class="text-gray-600">
+                                    <p>"I always thought my introverted personality didn't fit my marketing major. After talking with the AI mentor, it helped me identify the 'Data Analyst (Marketing)' role, which uses my professional knowledge without requiring too much social interaction. It's perfect for me!"</p>
+                                </blockquote>
+                                <p class="mt-4 font-semibold text-gray-900">- Li, a junior student</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-lg">
+                                <blockquote class="text-gray-600">
+                                    <p>"After working for three years, I felt like I was just repeating myself every day and lost my passion. Through 'Career Compass', I discovered my core drivers are 'creativity' and 'autonomy'. I'm now learning to develop my own small product in my spare time, and life feels hopeful again."</p>
+                                </blockquote>
+                                <p class="mt-4 font-semibold text-gray-900">- Ms. Wang, a young professional</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">Frequently Asked Questions</h2>
+                    <div class="space-y-4">
+                        <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
+                            <summary class="flex justify-between items-center font-semibold text-gray-900">
+                                Is this test and analysis free?
+                                <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </summary>
+                            <p class="mt-3 text-gray-600">
+                                Yes, it's completely free. We are committed to helping more people who are confused about their future through AI technology. Some of the models we use are provided with free quotas by platforms like OpenRouter, allowing us to pass this value on to you.
+                            </p>
+                        </details>
+                        <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
+                            <summary class="flex justify-between items-center font-semibold text-gray-900">
+                                Is my data and personal information secure?
+                                <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </summary>
+                            <p class="mt-3 text-gray-600">
+                                We take your privacy very seriously. Your answers and conversations with the AI are anonymous and are only used for the current analysis and dialogue. We do not store or use them for any other purpose.
+                            </p>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Have Suggestions or Feedback?</h2>
+                     <p class="text-gray-600 mb-6">We would love to hear your voice to help us make the product better.</p>
+                     <a href="mailto:feedback@jobhelp.online" class="bg-gray-900 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-gray-700 transition">
+                        Contact Us
+                    </a>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Turnstile container, will be managed programmatically -->
+    <div id="turnstile-container"></div>
+
+    <!-- Footer -->
+    <footer class="w-full py-6 text-center bg-white/50 border-t">
+        <p class="text-sm text-gray-500">&copy; 2025 Career Compass. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // --- CONFIGURATION ---
+        const API_URL = "/api/analyze";
+        const LANG = "en"; // Language setting for prompts
+
+        // --- Turnstile State Management ---
+        let turnstileWidgetId = null;
+        let actionQueue = []; // Stores the function to run after getting a token
+        let isVerificationInProgress = false; // State lock for Turnstile
+
+        window.onTurnstileLoad = function () {
+            if (typeof turnstile !== 'undefined') {
+                turnstileWidgetId = turnstile.render('#turnstile-container', {
+                    sitekey: '0x4AAAAAABhyfTjwR6RXipd_', 
+                    callback: function(token) {
+                        isVerificationInProgress = false;
+                        const action = actionQueue.shift();
+                        if (action) {
+                            action(token);
+                        }
+                    },
+                    'expired-callback': function() {
+                        isVerificationInProgress = false;
+                        if (turnstileWidgetId) {
+                            turnstile.reset(turnstileWidgetId);
+                        }
+                    },
+                    'error-callback': function() {
+                        isVerificationInProgress = false;
+                        displayError("Human verification failed. Please refresh the page and try again.");
+                    }
+                });
+            }
+        };
+
+        function getTurnstileToken(callback) {
+            if (isVerificationInProgress) return;
+            actionQueue.push(callback);
+            if (turnstileWidgetId !== null && typeof turnstile !== 'undefined') {
+                isVerificationInProgress = true;
+                try {
+                    turnstile.execute(turnstileWidgetId);
+                } catch (error) {
+                    console.error("Turnstile execution error:", error);
+                    isVerificationInProgress = false;
+                    displayError("Could not start human verification. Please check your connection or browser settings.");
+                }
+            } else {
+                console.error("Turnstile is not ready.");
+                displayError("Verification service is not ready. Please wait a moment and try again.");
+            }
+        }
+        
+        // --- DOM Elements ---
+        const quizContainer = document.getElementById('quiz-container');
+        const directInputContainer = document.getElementById('direct-input-container');
+        const skipQuizBtn = document.getElementById('skip-quiz-btn');
+        const skipQuizContainer = document.getElementById('skip-quiz-container');
+        const directInputText = document.getElementById('direct-input-text');
+        const directInputSubmitBtn = document.getElementById('direct-input-submit-btn');
+        const viewContainer = document.getElementById('view-container');
+        const resultsContainer = document.getElementById('results-container');
+        const initialResultDiv = document.getElementById('initial-result');
+        const chatWrapper = document.getElementById('chat-wrapper');
+        const chatHistory = document.getElementById('chat-history');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const additionalContent = document.getElementById('additional-content');
+        
+        // --- Quiz Questions and Logic ---
+        const questions = [
+            {
+                question: "If you had a free afternoon, what would you most likely do?",
+                options: [
+                    "Organize and plan your week",
+                    "Tinker with a new gadget or solve a puzzle",
+                    "Express yourself through art, music, or writing",
+                    "Help a friend with a problem or volunteer"
+                ]
+            },
+            {
+                question: "When working on a team project, what role do you naturally take on?",
+                options: [
+                    "The leader who delegates tasks and sets the vision",
+                    "The analyst who examines data and ensures accuracy",
+                    "The creative who brainstorms new and unconventional ideas",
+                    "The supporter who ensures everyone is heard and collaborates smoothly"
+                ]
+            },
+            {
+                question: "Which of these working environments sounds most appealing?",
+                options: [
+                    "A structured, stable environment with clear expectations",
+                    "A dynamic, challenging environment with complex problems to solve",
+                    "A flexible, independent environment where you can express your creativity",
+                    "A collaborative, mission-driven environment focused on making an impact"
+                ]
+            },
+            {
+                question: "What kind of accomplishment gives you the most satisfaction?",
+                options: [
+                    "Achieving a difficult goal through careful planning and execution",
+                    "Solving a complex problem that no one else could figure out",
+                    "Creating something entirely new that is uniquely yours",
+                    "Seeing your work make a tangible, positive difference in people's lives"
+                ]
+            },
+            {
+                question: "If you were to learn a new skill, which would you choose?",
+                options: [
+                    "Project management or financial planning",
+                    "A programming language or data science",
+                    "A musical instrument or graphic design",
+                    "Psychology or a new language for travel"
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let conversationHistory = [];
+        const showdownConverter = new showdown.Converter({
+            simplifiedAutoLink: true,
+            strikethrough: true,
+            tables: true
+        });
+
+        function createQuestionCard(index) {
+            const q = questions[index];
+            const card = document.createElement('div');
+            card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
+            card.innerHTML = `
+                <div class="text-sm font-semibold text-blue-600 mb-2">Question ${index + 1} of ${questions.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8">${q.question}</h2>
+                <div class="space-y-4">
+                    ${q.options.map((option, i) => `
+                        <button data-answer-index="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-transparent hover:border-blue-300 p-4 rounded-lg transition">
+                            ${option}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            setTimeout(() => card.classList.remove('card-enter'), 10);
+            return card;
+        }
+
+        function handleAnswerSelection(e) {
+            if (!e.target.matches('button[data-answer-index]')) return;
+            
+            const selectedOptionText = e.target.innerText;
+            userAnswers.push({ question: questions[currentQuestionIndex].question, answer: selectedOptionText });
+
+            const currentCard = quizContainer.firstChild;
+            currentCard.classList.add('card-exit');
+
+            currentCard.addEventListener('transitionend', () => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    const nextCard = createQuestionCard(currentQuestionIndex);
+                    quizContainer.innerHTML = '';
+                    quizContainer.appendChild(nextCard);
+                } else {
+                    getAnalysis();
+                }
+            }, { once: true });
+        }
+
+        function getAnalysis() {
+            const prompt = `Based on the following Q&A, please analyze my career personality and suggest 3 suitable job roles with reasons. Then, give a brief summary of my personality profile. Finally, end with 'You can now ask me any follow-up questions!'. Answers should be in English. Q&A: ${JSON.stringify(userAnswers)}`;
+            fetchResults(prompt, true);
+        }
+
+        function handleDirectInputSubmit() {
+            const userInput = directInputText.value.trim();
+            if (userInput) {
+                const prompt = `The user is seeking career advice. Their input is: "${userInput}". Please provide a comprehensive career analysis, suggest 3 suitable job roles with reasons, and summarize their potential strengths. Finally, end with 'You can now ask me any follow-up questions!'. Your response must be in English.`;
+                fetchResults(prompt, true);
+            } else {
+                alert("Please enter your thoughts before submitting.");
+            }
+        }
+
+        function setupInitialView() {
+            const firstCard = createQuestionCard(0);
+            quizContainer.appendChild(firstCard);
+        }
+        
+        function switchToDirectInput() {
+            const currentCard = quizContainer.firstChild;
+            if(currentCard) {
+                currentCard.classList.add('card-exit');
+                currentCard.addEventListener('transitionend', () => {
+                    quizContainer.classList.add('hidden');
+                    directInputContainer.classList.remove('hidden');
+                    directInputContainer.classList.add('card-enter');
+                    setTimeout(() => directInputContainer.classList.remove('card-enter'), 10);
+                }, { once: true });
+            } else {
+                quizContainer.classList.add('hidden');
+                directInputContainer.classList.remove('hidden');
+            }
+            
+            skipQuizContainer.innerHTML = `<button id="show-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">&larr; Back to Quiz</button>`;
+            document.getElementById('show-quiz-btn').addEventListener('click', switchToQuiz);
+        }
+
+        function switchToQuiz() {
+            directInputContainer.classList.add('card-exit');
+            directInputContainer.addEventListener('transitionend', () => {
+                directInputContainer.classList.add('hidden');
+                quizContainer.classList.remove('hidden');
+                const card = quizContainer.firstChild || createQuestionCard(currentQuestionIndex);
+                if(!quizContainer.firstChild) quizContainer.appendChild(card);
+                card.classList.remove('card-exit');
+                card.classList.add('card-enter');
+                setTimeout(() => card.classList.remove('card-enter'), 10);
+            }, { once: true });
+
+            skipQuizContainer.innerHTML = `<button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">Don't want to answer questions? Input your thoughts directly &rarr;</button>`;
+            document.getElementById('skip-quiz-btn').addEventListener('click', switchToDirectInput);
+        }
+
+        function showLoading() {
+            viewContainer.innerHTML = `
+                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
+                    <div class="spinner"></div>
+                    <p class="mt-4 text-gray-600 font-semibold">AI is analyzing, please wait a moment...</p>
+                    <p class="mt-2 text-sm text-gray-500">This may take about 15 seconds.</p>
+                </div>
+            `;
+            skipQuizContainer.classList.add('hidden');
+            additionalContent.classList.add('hidden');
+        }
+
+        function displayError(message) {
+             viewContainer.innerHTML = `
+                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
+                    <h2 class="text-2xl font-bold text-red-600">An Error Occurred</h2>
+                    <p class="mt-4 text-gray-600">${message}</p>
+                    <button onclick="location.reload()" class="mt-6 bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700">Try Again</button>
+                </div>
+            `;
+        }
+
+        async function fetchResults(prompt, isInitial) {
+            showLoading();
+            getTurnstileToken(async (token) => {
+                conversationHistory.push({ role: 'user', content: prompt });
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            turnstileToken: token,
+                            model: 'google/gemini-pro',
+                            messages: conversationHistory,
+                            stream: true
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'The server returned an error.');
+                    }
+                    
+                    if (isInitial) {
+                        viewContainer.classList.add('hidden');
+                        resultsContainer.classList.remove('hidden');
+                        additionalContent.classList.remove('hidden');
+                    }
+                    
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let fullResponse = "";
+                    
+                    let aiMessageDiv;
+                    if (!isInitial) {
+                        aiMessageDiv = document.createElement('div');
+                        aiMessageDiv.className = 'p-3 rounded-lg bg-gray-100';
+                        aiMessageDiv.innerHTML = `<div class="font-bold mb-2">AI Mentor</div><div class="prose max-w-none"></div>`;
+                        chatHistory.appendChild(aiMessageDiv);
+                    }
+
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                const dataStr = line.substring(5).trim();
+                                if (dataStr === '[DONE]') break;
+                                try {
+                                    const json = JSON.parse(dataStr);
+                                    if (json.choices && json.choices[0].delta && json.choices[0].delta.content) {
+                                        fullResponse += json.choices[0].delta.content;
+                                    }
+                                } catch (e) {
+                                    // Sometimes a chunk might not be a full JSON object, so we ignore parse errors and continue
+                                }
+                            }
+                        }
+                        
+                        if (isInitial) {
+                            initialResultDiv.innerHTML = `<div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div>`;
+                        } else {
+                            aiMessageDiv.querySelector('.prose').innerHTML = showdownConverter.makeHtml(fullResponse);
+                        }
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                    }
+                    
+                    conversationHistory.push({ role: 'assistant', content: fullResponse });
+
+                    if (isInitial) {
+                         const initialReportHtml = `<div class="p-3 rounded-lg bg-gray-100"><div class="font-bold mb-2">AI Mentor</div><div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div></div>`;
+                         chatHistory.innerHTML = initialReportHtml;
+                         chatWrapper.classList.remove('hidden');
+                    }
+                    
+                    enableChatInput();
+
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    displayError(error.message || "An unknown error occurred while fetching the analysis.");
+                }
+            });
+        }
+        
+        function handleChatSend() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'p-3 my-2 text-right';
+            userMessageDiv.innerHTML = `<div class="inline-block p-3 rounded-lg bg-blue-500 text-white"><div class="font-bold mb-2">You</div><div>${message}</div></div>`;
+            chatHistory.appendChild(userMessageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            chatInput.value = '';
+            disableChatInput();
+            
+            fetchResults(message, false);
+        }
+
+        function disableChatInput() {
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<div class="spinner w-5 h-5 mx-auto"></div>';
+        }
+
+        function enableChatInput() {
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '&rarr;';
+        }
+
+        // --- Event Listeners ---
+        quizContainer.addEventListener('click', handleAnswerSelection);
+        skipQuizBtn.addEventListener('click', switchToDirectInput);
+        directInputSubmitBtn.addEventListener('click', handleDirectInputSubmit);
+        sendBtn.addEventListener('click', handleChatSend);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleChatSend();
+            }
+        });
+
+        // --- Initializer ---
+        setupInitialView();
+
+    </script>
+</body>
+</html>

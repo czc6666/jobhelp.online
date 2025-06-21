@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Test | Brújula Profesional</title>
+    <meta name="description" content="Responde 5 preguntas diseñadas para obtener al instante un informe de análisis de personalidad profesional profundo generado por IA y comienza tu viaje de exploración de carrera.">
+    <meta name="keywords" content="test de carrera, análisis de personalidad, asesor de carrera IA, dirección profesional, Brújula Profesional, cuestionario online">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jobhelp.online/es/quiz.html">
+
+    <!-- Hreflang for SEO -->
+    <link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html">
+    <link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html">
+    <link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html">
+    <link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html">
+    <link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jobhelp.online/es/quiz.html">
+    <meta property="og:title" content="Iniciar Test | Brújula Profesional">
+    <meta property="og:description" content="Responde 5 preguntas diseñadas para obtener al instante un informe de análisis de personalidad profesional profundo generado por IA.">
+    <meta property="og:image" content="https://jobhelp.online/og-image.png">
+    <meta property="og:site_name" content="Brújula Profesional">
+    <meta property="og:locale" content="es_ES">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://jobhelp.online/es/quiz.html">
+    <meta name="twitter:title" content="Iniciar Test | Brújula Profesional">
+    <meta name="twitter:description" content="Responde 5 preguntas diseñadas para obtener al instante un informe de análisis de personalidad profesional profundo generado por IA.">
+    <meta name="twitter:image" content="https://jobhelp.online/og-image.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <!-- Turnstile Script -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script>
+    <style>
+        .quiz-card, #direct-input-container { min-height: 32rem; }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/es/" class="text-xl font-bold text-gray-900">Brújula Profesional</a>
+            <a href="/es/" class="text-sm font-semibold text-gray-600 hover:text-blue-600">
+                &larr; Volver al Inicio
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4">
+        <div id="view-container" class="w-full max-w-2xl mx-auto">
+            <!-- Quiz Container -->
+            <div id="quiz-container"></div>
+
+            <!-- Direct Input Container (hidden by default) -->
+            <div id="direct-input-container" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Habla Directamente con el Mentor de IA</h2>
+                <p class="text-gray-600 mb-6">Introduce tus dudas, ideas o una auto-presentación a continuación, y la IA generará un informe de planificación de carrera personalizado para ti.</p>
+                <textarea id="direct-input-text" rows="8" placeholder="Ej: Soy estudiante de marketing, pero me considero introvertido y no me gusta socializar. Estoy confundido sobre mi futuro y no sé qué hacer..." class="w-full border rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                <button id="direct-input-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-6">
+                    Dejar que la IA me analice
+                </button>
+            </div>
+        </div>
+
+        <!-- Skip Quiz Link -->
+        <div id="skip-quiz-container" class="text-center mt-6">
+            <button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">
+                ¿No quieres responder? Introduce tus ideas directamente &rarr;
+            </button>
+        </div>
+
+        <!-- Results/Chat Container -->
+        <div id="results-container" class="w-full max-w-3xl mx-auto hidden">
+            <div id="initial-result" class="text-center bg-white rounded-xl shadow-lg p-6 md:p-10"></div>
+            <div id="chat-wrapper" class="hidden mt-6 bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Conversación Profunda con el Mentor de IA</h2>
+                <div id="chat-history" class="h-[50vh] overflow-y-auto pr-4 mb-4 border-b"></div>
+                <div id="chat-input-container" class="flex items-center pt-4">
+                    <input type="text" id="chat-input" placeholder="¿Otras preguntas? Escribe aquí..." class="flex-grow border rounded-l-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="send-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-r-lg hover:bg-blue-700 transition">&rarr;</button>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- Turnstile container, will be managed programmatically -->
+    <div id="turnstile-container"></div>
+
+    <!-- Footer -->
+    <footer class="w-full py-6 text-center bg-white/50 border-t">
+        <p class="text-sm text-gray-500">&copy; 2025 Brújula Profesional. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // --- CONFIGURATION ---
+        const API_URL = "/api/analyze";
+        const LANG = "es"; // Language setting for prompts
+
+        // --- Turnstile, DOM Elements, and other logic is the same as the English version. ---
+        // The main difference is in the `questions` array and the UI text in the functions.
+
+        let turnstileWidgetId=null,actionQueue=[],isVerificationInProgress=!1;window.onTurnstileLoad=function(){"undefined"!=typeof turnstile&&(turnstileWidgetId=turnstile.render("#turnstile-container",{sitekey:"0x4AAAAAABhyfTjwR6RXipd_",callback:function(e){isVerificationInProgress=!1;const n=actionQueue.shift();n&&n(e)},"expired-callback":function(){isVerificationInProgress=!1,turnstileWidgetId&&turnstile.reset(turnstileWidgetId)},"error-callback":function(){isVerificationInProgress=!1,displayError("La verificación humana falló. Por favor, actualiza la página e inténtalo de nuevo.")}}))};function getTurnstileToken(e){if(isVerificationInProgress)return;actionQueue.push(e),null!==turnstileWidgetId&&"undefined"!=typeof turnstile?(isVerificationInProgress=!0,turnstile.execute(turnstileWidgetId)):(console.error("Turnstile no está listo."),displayError("El servicio de verificación no está listo. Por favor, espera un momento e inténtalo de nuevo."))}const quizContainer=document.getElementById("quiz-container"),directInputContainer=document.getElementById("direct-input-container"),skipQuizBtn=document.getElementById("skip-quiz-btn"),skipQuizContainer=document.getElementById("skip-quiz-container"),directInputText=document.getElementById("direct-input-text"),directInputSubmitBtn=document.getElementById("direct-input-submit-btn"),viewContainer=document.getElementById("view-container"),resultsContainer=document.getElementById("results-container"),initialResultDiv=document.getElementById("initial-result"),chatWrapper=document.getElementById("chat-wrapper"),chatHistory=document.getElementById("chat-history"),chatInput=document.getElementById("chat-input"),sendBtn=document.getElementById("send-btn");
+        
+        // --- Quiz Questions and Logic (Spanish) ---
+        const questions = [
+            {
+                question: "Si tuvieras una tarde libre, ¿qué sería lo más probable que hicieras?",
+                options: [
+                    "Organizar y planificar tu semana",
+                    "Jugar con un nuevo gadget o resolver un rompecabezas",
+                    "Expresarte a través del arte, la música o la escritura",
+                    "Ayudar a un amigo con un problema o hacer voluntariado"
+                ]
+            },
+            {
+                question: "Al trabajar en un proyecto de equipo, ¿qué rol asumes naturalmente?",
+                options: [
+                    "El líder que delega tareas y establece la visión",
+                    "El analista que examina los datos y asegura la precisión",
+                    "El creativo que aporta ideas nuevas y no convencionales",
+                    "El mediador que se asegura de que todos sean escuchados y colaboren sin problemas"
+                ]
+            },
+            {
+                question: "¿Cuál de estos entornos de trabajo te parece más atractivo?",
+                options: [
+                    "Un entorno estructurado y estable con expectativas claras",
+                    "Un entorno dinámico y desafiante con problemas complejos que resolver",
+                    "Un entorno flexible e independiente donde puedas expresar tu creatividad",
+                    "Un entorno colaborativo y orientado a una misión, centrado en generar un impacto"
+                ]
+            },
+            {
+                question: "¿Qué tipo de logro te da la mayor satisfacción?",
+                options: [
+                    "Alcanzar un objetivo difícil mediante una planificación y ejecución cuidadosas",
+                    "Resolver un problema complejo que nadie más pudo descifrar",
+                    "Crear algo completamente nuevo que sea únicamente tuyo",
+                    "Ver que tu trabajo marca una diferencia tangible y positiva en la vida de las personas"
+                ]
+            },
+            {
+                question: "Si tuvieras que aprender una nueva habilidad, ¿cuál elegirías?",
+                options: [
+                    "Gestión de proyectos o planificación financiera",
+                    "Un lenguaje de programación o ciencia de datos",
+                    "Un instrumento musical o diseño gráfico",
+                    "Psicología o un nuevo idioma para viajar"
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let conversationHistory = [];
+        const showdownConverter = new showdown.Converter({
+            simplifiedAutoLink: true,
+            strikethrough: true,
+            tables: true
+        });
+
+        function createQuestionCard(index) {
+            const q = questions[index];
+            const card = document.createElement('div');
+            card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10';
+            card.innerHTML = `
+                <div class="text-sm font-semibold text-blue-600 mb-2">Pregunta ${index + 1} de ${questions.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8">${q.question}</h2>
+                <div class="space-y-4">
+                    ${q.options.map((option, i) => `
+                        <button data-answer-index="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-transparent hover:border-blue-300 p-4 rounded-lg transition">
+                            ${option}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            return card;
+        }
+
+        function handleAnswerSelection(e) {
+            if (!e.target.matches('button[data-answer-index]')) return;
+            userAnswers.push({ question: questions[currentQuestionIndex].question, answer: e.target.innerText });
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                const nextCard = createQuestionCard(currentQuestionIndex);
+                quizContainer.innerHTML = '';
+                quizContainer.appendChild(nextCard);
+            } else {
+                getAnalysis();
+            }
+        }
+
+        function getAnalysis() {
+            const prompt = `Basado en las siguientes preguntas y respuestas, analiza mi personalidad profesional y sugiere 3 roles laborales adecuados con sus razones. Luego, da un breve resumen de mi perfil de personalidad. Finalmente, termina con '¡Ahora puedes hacerme cualquier pregunta de seguimiento!'. Las respuestas deben ser en español. P&R: ${JSON.stringify(userAnswers)}`;
+            fetchResults(prompt, true);
+        }
+
+        function handleDirectInputSubmit() {
+            const userInput = directInputText.value.trim();
+            if (userInput) {
+                const prompt = `El usuario busca consejo profesional. Su entrada es: "${userInput}". Proporciona un análisis de carrera completo, sugiere 3 roles laborales adecuados con razones y resume sus fortalezas potenciales. Finalmente, termina con '¡Ahora puedes hacerme cualquier pregunta de seguimiento!'. Tu respuesta debe ser en español.`;
+                fetchResults(prompt, true);
+            } else {
+                alert("Por favor, introduce tus ideas antes de enviar.");
+            }
+        }
+        
+        function setupInitialView(){const e=createQuestionCard(0);quizContainer.appendChild(e)}function switchToDirectInput(){quizContainer.classList.add("hidden"),directInputContainer.classList.remove("hidden"),skipQuizContainer.innerHTML=`<button id="show-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">&larr; Volver al Cuestionario</button>`,document.getElementById("show-quiz-btn").addEventListener("click",switchToQuiz)}function switchToQuiz(){directInputContainer.classList.add("hidden"),quizContainer.classList.remove("hidden"),skipQuizContainer.innerHTML=`<button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">¿No quieres responder? Introduce tus ideas directamente &rarr;</button>`,document.getElementById("skip-quiz-btn").addEventListener("click",switchToDirectInput)}
+
+        function showLoading() {
+            viewContainer.innerHTML = `
+                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
+                    <div class="spinner border-4 border-gray-200 border-l-blue-600 rounded-full w-10 h-10 animate-spin"></div>
+                    <p class="mt-4 text-gray-600 font-semibold">La IA está analizando, por favor espera un momento...</p>
+                    <p class="mt-2 text-sm text-gray-500">Esto puede tardar unos 15 segundos.</p>
+                </div>
+            `;
+            skipQuizContainer.classList.add('hidden');
+        }
+
+        function displayError(message) {
+             viewContainer.innerHTML = `
+                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
+                    <h2 class="text-2xl font-bold text-red-600">Ocurrió un Error</h2>
+                    <p class="mt-4 text-gray-600">${message}</p>
+                    <button onclick="location.reload()" class="mt-6 bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700">Intentar de Nuevo</button>
+                </div>
+            `;
+        }
+
+        async function fetchResults(prompt, isInitial) {
+            showLoading();
+            getTurnstileToken(async (token) => {
+                conversationHistory.push({ role: 'user', content: prompt });
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            turnstileToken: token,
+                            model: 'google/gemini-pro',
+                            messages: conversationHistory,
+                            stream: true
+                        })
+                    });
+
+                    if (!response.ok) throw new Error((await response.json()).error || 'El servidor devolvió un error.');
+                    
+                    if (isInitial) {
+                        viewContainer.classList.add('hidden');
+                        resultsContainer.classList.remove('hidden');
+                    }
+                    
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let fullResponse = "";
+                    let aiMessageDiv;
+
+                    if (!isInitial) {
+                        aiMessageDiv = document.createElement('div');
+                        aiMessageDiv.className = 'p-3 rounded-lg bg-gray-100';
+                        aiMessageDiv.innerHTML = `<div class="font-bold mb-2">Mentor de IA</div><div class="prose max-w-none"></div>`;
+                        chatHistory.appendChild(aiMessageDiv);
+                    }
+
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        const chunk = decoder.decode(value, { stream: true });
+                        for (const line of chunk.split('\n')) {
+                            if (line.startsWith('data: ')) {
+                                const dataStr = line.substring(5).trim();
+                                if (dataStr === '[DONE]') break;
+                                try {
+                                    const json = JSON.parse(dataStr);
+                                    if (json.choices && json.choices[0].delta && json.choices[0].delta.content) {
+                                        fullResponse += json.choices[0].delta.content;
+                                    }
+                                } catch (e) {}
+                            }
+                        }
+                        if (isInitial) initialResultDiv.innerHTML = `<div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div>`;
+                        else aiMessageDiv.querySelector('.prose').innerHTML = showdownConverter.makeHtml(fullResponse);
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                    }
+                    
+                    conversationHistory.push({ role: 'assistant', content: fullResponse });
+
+                    if (isInitial) {
+                         chatHistory.innerHTML = `<div class="p-3 rounded-lg bg-gray-100"><div class="font-bold mb-2">Mentor de IA</div><div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div></div>`;
+                         chatWrapper.classList.remove('hidden');
+                    }
+                    enableChatInput();
+                } catch (error) {
+                    displayError(error.message || "Ocurrió un error desconocido al obtener el análisis.");
+                }
+            });
+        }
+        
+        function handleChatSend(){const e=chatInput.value.trim();if(!e)return;const n=document.createElement("div");n.className="p-3 my-2 text-right",n.innerHTML=`<div class="inline-block p-3 rounded-lg bg-blue-500 text-white"><div class="font-bold mb-2">Tú</div><div>${e}</div></div>`,chatHistory.appendChild(n),chatHistory.scrollTop=chatHistory.scrollHeight,chatInput.value="",disableChatInput(),fetchResults(e,!1)}function disableChatInput(){chatInput.disabled=!0,sendBtn.disabled=!0,sendBtn.innerHTML='<div class="spinner w-5 h-5 mx-auto"></div>'}function enableChatInput(){chatInput.disabled=!1,sendBtn.disabled=!1,sendBtn.innerHTML="&rarr;"}
+        quizContainer.addEventListener('click', handleAnswerSelection);
+        skipQuizBtn.addEventListener('click', switchToDirectInput);
+        directInputSubmitBtn.addEventListener('click', handleDirectInputSubmit);
+        sendBtn.addEventListener('click', handleChatSend);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChatSend(); } });
+
+        setupInitialView();
+    </script>
+</body>
+</html> 

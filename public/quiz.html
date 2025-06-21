@@ -9,6 +9,12 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://jobhelp.online/quiz.html">
 
+    <!-- Hreflang for SEO -->
+    <link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html">
+    <link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html">
+    <link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html">
+    <link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://jobhelp.online/quiz.html">
@@ -109,8 +115,9 @@
             <div id="direct-input-container" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-10">
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">直接与AI导师对话</h2>
                 <p class="text-gray-600 mb-6">请在下方输入你的困惑、想法或一段自我介绍，AI会为你生成专属的职业规划报告。</p>
-                <textarea id="direct-input-text" rows="8" placeholder="例如：我是一名大三学生，学的市场营销，但感觉自己性格内向，不喜欢和人打交道，对未来很迷茫，不知道能做什么..." class="w-full border rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
-                <button id="direct-input-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-6">
+                <label for="direct-input-text" class="sr-only">输入你的困惑、想法或一段自我介绍</label>
+                <textarea id="direct-input-text" rows="8" placeholder="例如：我是一名大三学生，学的市场营销，但感觉自己性格内向，不喜欢和人打交道，对未来很迷茫，不知道能做什么..." class="w-full border rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500"></textarea>
+                <button id="direct-input-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-6 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
                     让AI为我分析
                 </button>
             </div>
@@ -118,7 +125,7 @@
 
         <!-- Skip Quiz Link -->
         <div id="skip-quiz-container" class="text-center mt-6">
-            <button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">
+            <button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">
                 不想答题？直接输入你的想法 &rarr;
             </button>
         </div>
@@ -135,8 +142,9 @@
                     <!-- Full report and chat history will appear here -->
                 </div>
                 <div id="chat-input-container" class="flex items-center pt-4">
-                    <input type="text" id="chat-input" placeholder="有其他问题？在这里输入..." class="flex-grow border rounded-l-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    <button id="send-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-r-lg hover:bg-blue-700 transition">&rarr;</button>
+                    <label for="chat-input" class="sr-only">输入你的问题</label>
+                    <input type="text" id="chat-input" placeholder="有其他问题？在这里输入..." class="flex-grow border rounded-l-lg p-3 focus:ring-2 focus:ring-blue-500">
+                    <button id="send-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-r-lg hover:bg-blue-700 transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500">&rarr;</button>
                 </div>
             </div>
         </div>
@@ -199,7 +207,7 @@
                 <div class="text-center">
                      <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">有建议或反馈？</h2>
                      <p class="text-gray-600 mb-6">我们非常希望能听到您的声音，这能帮助我们把产品做得更好。</p>
-                     <a href="mailto:feedback@jobhelp.online" class="bg-gray-900 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-gray-700 transition">
+                     <a href="mailto:feedback@jobhelp.online" class="bg-gray-900 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-gray-700 transition focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-700">
                         联系我们
                     </a>
                 </div>

@@ -1,20 +1,141 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created by AI assistant -->
-<url>
-  <loc>https://jobhelp.online/</loc>
-  <lastmod>2024-07-29T12:00:00+00:00</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>1.00</priority>
-</url>
-<url>
-  <loc>https://jobhelp.online/quiz.html</loc>
-  <lastmod>2024-07-29T12:00:00+00:00</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-</url>
-</urlset> 
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+    <!-- Homepage URLs -->
+    <url>
+        <loc>https://jobhelp.online/</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/en/</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/es/</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/de/</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/fr/</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/ja/</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/"/>
+    </url>
+
+    <!-- Quiz Page URLs -->
+    <url>
+        <loc>https://jobhelp.online/quiz.html</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/en/quiz.html</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/es/quiz.html</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/de/quiz.html</loc>
+        <lastmod>2025-06-21</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/fr/quiz.html</loc>
+        <lastmod>2024-07-31</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html"/>
+    </url>
+    <url>
+        <loc>https://jobhelp.online/ja/quiz.html</loc>
+        <lastmod>2024-07-31</lastmod>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/quiz.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html"/>
+    </url>
+
+</urlset>

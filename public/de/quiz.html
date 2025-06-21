@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test starten | Karriere-Kompass</title>
+    <meta name="description" content="Beantworten Sie 5 Fragen, um sofort einen KI-generierten, tiefgehenden Analysebericht Ihrer beruflichen Persönlichkeit zu erhalten und Ihre Karriere-Entdeckungsreise zu beginnen.">
+    <meta name="keywords" content="Karrieretest, Persönlichkeitsanalyse, KI-Karriereberater, berufliche Richtung, Karriere-Kompass, Online-Quiz">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jobhelp.online/de/quiz.html">
+
+    <!-- Hreflang for SEO -->
+    <link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html">
+    <link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html">
+    <link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html">
+    <link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html">
+    <link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jobhelp.online/de/quiz.html">
+    <meta property="og:title" content="Test starten | Karriere-Kompass">
+    <meta property="og:description" content="Beantworten Sie 5 Fragen und erhalten Sie sofort einen KI-generierten, tiefgehenden Analysebericht.">
+    <meta property="og:image" content="https://jobhelp.online/og-image.png">
+    <meta property="og:site_name" content="Karriere-Kompass">
+    <meta property="og:locale" content="de_DE">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://jobhelp.online/de/quiz.html">
+    <meta name="twitter:title" content="Test starten | Karriere-Kompass">
+    <meta name="twitter:description" content="Beantworten Sie 5 Fragen und erhalten Sie sofort einen KI-generierten, tiefgehenden Analysebericht.">
+    <meta name="twitter:image" content="https://jobhelp.online/og-image.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script>
+    <style> .quiz-card, #direct-input-container { min-height: 32rem; } </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/de/" class="text-xl font-bold text-gray-900">Karriere-Kompass</a>
+            <a href="/de/" class="text-sm font-semibold text-gray-600 hover:text-blue-600">
+                &larr; Zurück zur Startseite
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4">
+        <div id="view-container" class="w-full max-w-2xl mx-auto">
+            <!-- Quiz Container -->
+            <div id="quiz-container"></div>
+            <!-- Direct Input -->
+            <div id="direct-input-container" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Direkt mit dem KI-Mentor sprechen</h2>
+                <p class="text-gray-600 mb-6">Geben Sie unten Ihre Bedenken, Gedanken oder eine kurze Vorstellung ein, und die KI erstellt einen persönlichen Karriereplan für Sie.</p>
+                <textarea id="direct-input-text" rows="8" placeholder="z.B.: Ich studiere Marketing, fühle mich aber introvertiert und mag keinen Smalltalk. Ich bin unsicher über meine Zukunft..." class="w-full border rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                <button id="direct-input-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-6">
+                    Analyse von KI anfordern
+                </button>
+            </div>
+        </div>
+
+        <!-- Skip Link -->
+        <div id="skip-quiz-container" class="text-center mt-6">
+            <button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">
+                Keine Fragen beantworten? Geben Sie Ihre Gedanken direkt ein &rarr;
+            </button>
+        </div>
+
+        <!-- Results/Chat -->
+        <div id="results-container" class="w-full max-w-3xl mx-auto hidden">
+            <div id="initial-result" class="text-center bg-white rounded-xl shadow-lg p-6 md:p-10"></div>
+            <div id="chat-wrapper" class="hidden mt-6 bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Tiefgehendes Gespräch mit dem KI-Mentor</h2>
+                <div id="chat-history" class="h-[50vh] overflow-y-auto pr-4 mb-4 border-b"></div>
+                <div id="chat-input-container" class="flex items-center pt-4">
+                    <input type="text" id="chat-input" placeholder="Weitere Fragen? Hier eingeben..." class="flex-grow border rounded-l-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="send-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-r-lg hover:bg-blue-700 transition">&rarr;</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="turnstile-container"></div>
+    <footer class="w-full py-6 text-center bg-white/50 border-t">
+        <p class="text-sm text-gray-500">&copy; 2025 Karriere-Kompass. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <script>
+        const API_URL = "/api/analyze";
+        const LANG = "de";
+
+        let turnstileWidgetId=null,actionQueue=[],isVerificationInProgress=!1;window.onTurnstileLoad=function(){"undefined"!=typeof turnstile&&(turnstileWidgetId=turnstile.render("#turnstile-container",{sitekey:"0x4AAAAAABhyfTjwR6RXipd_",callback:function(e){isVerificationInProgress=!1;const n=actionQueue.shift();n&&n(e)},"expired-callback":function(){isVerificationInProgress=!1,turnstileWidgetId&&turnstile.reset(turnstileWidgetId)},"error-callback":function(){isVerificationInProgress=!1,displayError("Die Verifizierung ist fehlgeschlagen. Bitte laden Sie die Seite neu.")}}))};function getTurnstileToken(e){if(isVerificationInProgress)return;actionQueue.push(e),null!==turnstileWidgetId&&"undefined"!=typeof turnstile?(isVerificationInProgress=!0,turnstile.execute(turnstileWidgetId)):(console.error("Turnstile ist nicht bereit."),displayError("Verifizierungsdienst ist nicht bereit."))}const quizContainer=document.getElementById("quiz-container"),directInputContainer=document.getElementById("direct-input-container"),skipQuizBtn=document.getElementById("skip-quiz-btn"),skipQuizContainer=document.getElementById("skip-quiz-container"),directInputText=document.getElementById("direct-input-text"),directInputSubmitBtn=document.getElementById("direct-input-submit-btn"),viewContainer=document.getElementById("view-container"),resultsContainer=document.getElementById("results-container"),initialResultDiv=document.getElementById("initial-result"),chatWrapper=document.getElementById("chat-wrapper"),chatHistory=document.getElementById("chat-history"),chatInput=document.getElementById("chat-input"),sendBtn=document.getElementById("send-btn");
+        
+        const questions = [
+            {
+                question: "Wenn Sie einen freien Nachmittag hätten, was würden Sie am ehesten tun?",
+                options: [
+                    "Ihre Woche organisieren und planen",
+                    "An einem neuen Gerät basteln oder ein Rätsel lösen",
+                    "Sich durch Kunst, Musik oder Schreiben ausdrücken",
+                    "Einem Freund bei einem Problem helfen oder ehrenamtlich arbeiten"
+                ]
+            },
+            {
+                question: "Welche Rolle übernehmen Sie in einem Teamprojekt ganz natürlich?",
+                options: [
+                    "Der Anführer, der Aufgaben delegiert und die Vision vorgibt",
+                    "Der Analytiker, der Daten prüft und Genauigkeit sicherstellt",
+                    "Der Kreative, der neue und unkonventionelle Ideen entwickelt",
+                    "Der Unterstützer, der dafür sorgt, dass jeder gehört wird und reibungslos zusammenarbeitet"
+                ]
+            },
+            {
+                question: "Welche dieser Arbeitsumgebungen klingt für Sie am attraktivsten?",
+                options: [
+                    "Eine strukturierte, stabile Umgebung mit klaren Erwartungen",
+                    "Eine dynamische, herausfordernde Umgebung mit komplexen Problemen",
+                    "Eine flexible, unabhängige Umgebung, in der Sie Ihre Kreativität ausleben können",
+                    "Eine kollaborative, missionsorientierte Umgebung, die darauf abzielt, etwas zu bewirken"
+                ]
+            },
+            {
+                question: "Welche Art von Erfolg bereitet Ihnen die größte Zufriedenheit?",
+                options: [
+                    "Ein schwieriges Ziel durch sorgfältige Planung und Ausführung erreichen",
+                    "Ein komplexes Problem lösen, das niemand sonst knacken konnte",
+                    "Etwas völlig Neues schaffen, das einzigartig für Sie ist",
+                    "Sehen, wie Ihre Arbeit einen spürbaren, positiven Unterschied im Leben von Menschen macht"
+                ]
+            },
+            {
+                question: "Wenn Sie eine neue Fähigkeit erlernen würden, welche würden Sie wählen?",
+                options: [
+                    "Projektmanagement oder Finanzplanung",
+                    "Eine Programmiersprache oder Datenwissenschaft",
+                    "Ein Musikinstrument oder Grafikdesign",
+                    "Psychologie oder eine neue Sprache für Reisen"
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let conversationHistory = [];
+        const showdownConverter = new showdown.Converter({ simplifiedAutoLink: true, strikethrough: true, tables: true });
+
+        function createQuestionCard(index) {
+            const q = questions[index];
+            const card = document.createElement('div');
+            card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10';
+            card.innerHTML = `
+                <div class="text-sm font-semibold text-blue-600 mb-2">Frage ${index + 1} von ${questions.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8">${q.question}</h2>
+                <div class="space-y-4">
+                    ${q.options.map((option, i) => `<button data-answer-index="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-transparent hover:border-blue-300 p-4 rounded-lg transition">${option}</button>`).join('')}
+                </div>`;
+            return card;
+        }
+
+        function handleAnswerSelection(e) {
+            if (!e.target.matches('button[data-answer-index]')) return;
+            userAnswers.push({ question: questions[currentQuestionIndex].question, answer: e.target.innerText });
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                quizContainer.innerHTML = '';
+                quizContainer.appendChild(createQuestionCard(currentQuestionIndex));
+            } else {
+                getAnalysis();
+            }
+        }
+
+        function getAnalysis() {
+            const prompt = `Basierend auf den folgenden F&A, analysieren Sie bitte meine berufliche Persönlichkeit, schlagen Sie 3 passende Berufsrollen mit Begründungen vor und geben Sie eine kurze Zusammenfassung meines Persönlichkeitsprofils. Beenden Sie die Antwort mit 'Sie können mir jetzt beliebige Folgefragen stellen!'. Die Antwort muss auf Deutsch sein. F&A: ${JSON.stringify(userAnswers)}`;
+            fetchResults(prompt, true);
+        }
+
+        function handleDirectInputSubmit() {
+            const userInput = directInputText.value.trim();
+            if (userInput) {
+                const prompt = `Der Benutzer sucht Berufsberatung. Seine Eingabe lautet: "${userInput}". Bitte erstellen Sie eine umfassende Karriereanalyse, schlagen Sie 3 passende Berufsrollen mit Begründungen vor und fassen Sie seine potenziellen Stärken zusammen. Beenden Sie die Antwort mit 'Sie können mir jetzt beliebige Folgefragen stellen!'. Ihre Antwort muss auf Deutsch sein.`;
+                fetchResults(prompt, true);
+            } else {
+                alert("Bitte geben Sie Ihre Gedanken ein, bevor Sie senden.");
+            }
+        }
+        
+        function setupInitialView(){quizContainer.appendChild(createQuestionCard(0))}function switchToDirectInput(){quizContainer.classList.add("hidden"),directInputContainer.classList.remove("hidden"),skipQuizContainer.innerHTML=`<button id="show-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">&larr; Zurück zum Quiz</button>`,document.getElementById("show-quiz-btn").addEventListener("click",switchToQuiz)}function switchToQuiz(){directInputContainer.classList.add("hidden"),quizContainer.classList.remove("hidden"),skipQuizContainer.innerHTML=`<button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">Keine Fragen beantworten? Geben Sie Ihre Gedanken direkt ein &rarr;</button>`,document.getElementById("skip-quiz-btn").addEventListener("click",switchToDirectInput)}
+
+        function showLoading() {
+            viewContainer.innerHTML = `
+                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
+                    <div class="spinner border-4 border-gray-200 border-l-blue-600 rounded-full w-10 h-10 animate-spin"></div>
+                    <p class="mt-4 text-gray-600 font-semibold">KI analysiert, bitte warten...</p>
+                    <p class="mt-2 text-sm text-gray-500">Dies kann etwa 15 Sekunden dauern.</p>
+                </div>`;
+            skipQuizContainer.classList.add('hidden');
+        }
+
+        function displayError(message) {
+             viewContainer.innerHTML = `
+                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
+                    <h2 class="text-2xl font-bold text-red-600">Ein Fehler ist aufgetreten</h2>
+                    <p class="mt-4 text-gray-600">${message}</p>
+                    <button onclick="location.reload()" class="mt-6 bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700">Erneut versuchen</button>
+                </div>`;
+        }
+
+        async function fetchResults(prompt, isInitial) {
+            showLoading();
+            getTurnstileToken(async (token) => {
+                conversationHistory.push({ role: 'user', content: prompt });
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            turnstileToken: token, model: 'google/gemini-pro', messages: conversationHistory, stream: true
+                        })
+                    });
+                    if (!response.ok) throw new Error((await response.json()).error || 'Der Server hat einen Fehler gemeldet.');
+                    if (isInitial) {
+                        viewContainer.classList.add('hidden');
+                        resultsContainer.classList.remove('hidden');
+                    }
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let fullResponse = "";
+                    let aiMessageDiv;
+                    if (!isInitial) {
+                        aiMessageDiv = document.createElement('div');
+                        aiMessageDiv.className = 'p-3 rounded-lg bg-gray-100';
+                        aiMessageDiv.innerHTML = `<div class="font-bold mb-2">KI-Mentor</div><div class="prose max-w-none"></div>`;
+                        chatHistory.appendChild(aiMessageDiv);
+                    }
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        const chunk = decoder.decode(value, { stream: true });
+                        for (const line of chunk.split('\n')) {
+                            if (line.startsWith('data: ')) {
+                                const dataStr = line.substring(5).trim();
+                                if (dataStr === '[DONE]') break;
+                                try {
+                                    const json = JSON.parse(dataStr);
+                                    if (json.choices && json.choices[0].delta && json.choices[0].delta.content) {
+                                        fullResponse += json.choices[0].delta.content;
+                                    }
+                                } catch (e) {}
+                            }
+                        }
+                        if (isInitial) initialResultDiv.innerHTML = `<div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div>`;
+                        else aiMessageDiv.querySelector('.prose').innerHTML = showdownConverter.makeHtml(fullResponse);
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                    }
+                    conversationHistory.push({ role: 'assistant', content: fullResponse });
+                    if (isInitial) {
+                         chatHistory.innerHTML = `<div class="p-3 rounded-lg bg-gray-100"><div class="font-bold mb-2">KI-Mentor</div><div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div></div>`;
+                         chatWrapper.classList.remove('hidden');
+                    }
+                    enableChatInput();
+                } catch (error) {
+                    displayError(error.message || "Unbekannter Fehler beim Abrufen der Analyse.");
+                }
+            });
+        }
+        
+        function handleChatSend(){const e=chatInput.value.trim();if(!e)return;const n=document.createElement("div");n.className="p-3 my-2 text-right",n.innerHTML=`<div class="inline-block p-3 rounded-lg bg-blue-500 text-white"><div class="font-bold mb-2">Sie</div><div>${e}</div></div>`,chatHistory.appendChild(n),chatHistory.scrollTop=chatHistory.scrollHeight,chatInput.value="",disableChatInput(),fetchResults(e,!1)}function disableChatInput(){chatInput.disabled=!0,sendBtn.disabled=!0,sendBtn.innerHTML='<div class="spinner w-5 h-5 mx-auto"></div>'}function enableChatInput(){chatInput.disabled=!1,sendBtn.disabled=!1,sendBtn.innerHTML="&rarr;"}
+        quizContainer.addEventListener('click', handleAnswerSelection);
+        skipQuizBtn.addEventListener('click', switchToDirectInput);
+        directInputSubmitBtn.addEventListener('click', handleDirectInputSubmit);
+        sendBtn.addEventListener('click', handleChatSend);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChatSend(); } });
+
+        setupInitialView();
+    </script>
+</body>
+</html> 
