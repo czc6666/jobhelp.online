@@ -100,219 +100,305 @@
     </footer>
 
     <script>
-        // --- CONFIGURATION ---
         const API_URL = "/api/analyze";
-        const LANG = "es"; // Language setting for prompts
+        const LANG = "es";
+        let turnstileWidgetId = null;
+        let actionQueue = [];
+        let isVerificationInProgress = false;
 
-        // --- Turnstile, DOM Elements, and other logic is the same as the English version. ---
-        // The main difference is in the `questions` array and the UI text in the functions.
+        window.onTurnstileLoad = function () {
+            if (typeof turnstile !== 'undefined') {
+                turnstileWidgetId = turnstile.render('#turnstile-container', {
+                    sitekey: '0x4AAAAAABhyfTjwR6RXipd_', 
+                    callback: function(token) {
+                        isVerificationInProgress = false;
+                        const action = actionQueue.shift();
+                        if (action) { action(token); }
+                    },
+                    'expired-callback': function() {
+                        isVerificationInProgress = false;
+                        if (turnstileWidgetId) { turnstile.reset(turnstileWidgetId); }
+                    },
+                    'error-callback': function() {
+                        isVerificationInProgress = false;
+                        console.error('Turnstile verification failed.');
+                        alert('La verificación de seguridad ha fallado. Por favor, actualiza la página e inténtalo de nuevo.');
+                    },
+                    size: 'invisible'
+                });
+            }
+        };
 
-        let turnstileWidgetId=null,actionQueue=[],isVerificationInProgress=!1;window.onTurnstileLoad=function(){"undefined"!=typeof turnstile&&(turnstileWidgetId=turnstile.render("#turnstile-container",{sitekey:"0x4AAAAAABhyfTjwR6RXipd_",callback:function(e){isVerificationInProgress=!1;const n=actionQueue.shift();n&&n(e)},"expired-callback":function(){isVerificationInProgress=!1,turnstileWidgetId&&turnstile.reset(turnstileWidgetId)},"error-callback":function(){isVerificationInProgress=!1,displayError("La verificación humana falló. Por favor, actualiza la página e inténtalo de nuevo.")}}))};function getTurnstileToken(e){if(isVerificationInProgress)return;actionQueue.push(e),null!==turnstileWidgetId&&"undefined"!=typeof turnstile?(isVerificationInProgress=!0,turnstile.execute(turnstileWidgetId)):(console.error("Turnstile no está listo."),displayError("El servicio de verificación no está listo. Por favor, espera un momento e inténtalo de nuevo."))}const quizContainer=document.getElementById("quiz-container"),directInputContainer=document.getElementById("direct-input-container"),skipQuizBtn=document.getElementById("skip-quiz-btn"),skipQuizContainer=document.getElementById("skip-quiz-container"),directInputText=document.getElementById("direct-input-text"),directInputSubmitBtn=document.getElementById("direct-input-submit-btn"),viewContainer=document.getElementById("view-container"),resultsContainer=document.getElementById("results-container"),initialResultDiv=document.getElementById("initial-result"),chatWrapper=document.getElementById("chat-wrapper"),chatHistory=document.getElementById("chat-history"),chatInput=document.getElementById("chat-input"),sendBtn=document.getElementById("send-btn");
-        
-        // --- Quiz Questions and Logic (Spanish) ---
+        function withTurnstileVerification(action) {
+            if (isVerificationInProgress) { return; }
+            actionQueue.push(action);
+            isVerificationInProgress = true;
+            if (turnstileWidgetId) { turnstile.execute(turnstileWidgetId); }
+        }
+
         const questions = [
             {
-                question: "Si tuvieras una tarde libre, ¿qué sería lo más probable que hicieras?",
+                question: "Imagina que estás en una fiesta informal. ¿Qué actividad te atraería más?",
                 options: [
-                    "Organizar y planificar tu semana",
-                    "Jugar con un nuevo gadget o resolver un rompecabezas",
-                    "Expresarte a través del arte, la música o la escritura",
-                    "Ayudar a un amigo con un problema o hacer voluntariado"
+                    "Tener una conversación profunda y personal con un amigo cercano.",
+                    "Observar a la gente y analizar las dinámicas sociales.",
+                    "Participar en un juego de mesa animado o una actividad de grupo.",
+                    "Ayudar al anfitrión a organizar la comida o asegurarse de que todos se diviertan."
                 ]
             },
             {
-                question: "Al trabajar en un proyecto de equipo, ¿qué rol asumes naturalmente?",
+                question: "Si tuvieras un fin de semana completamente libre, ¿cómo lo pasarías idealmente?",
                 options: [
-                    "El líder que delega tareas y establece la visión",
-                    "El analista que examina los datos y asegura la precisión",
-                    "El creativo que aporta ideas nuevas y no convencionales",
-                    "El mediador que se asegura de que todos sean escuchados y colaboren sin problemas"
+                    "Leyendo un libro, aprendiendo una nueva habilidad o viendo un documental.",
+                    "Creando algo: escribir, dibujar, componer música o un proyecto de bricolaje.",
+                    "Haciendo senderismo, practicando un deporte o realizando alguna otra actividad física al aire libre.",
+                    "Pasando tiempo de calidad con la familia o los amigos."
                 ]
             },
             {
-                question: "¿Cuál de estos entornos de trabajo te parece más atractivo?",
+                question: "Al enfrentarte a un problema complejo en el trabajo, ¿cuál es tu enfoque inicial?",
                 options: [
-                    "Un entorno estructurado y estable con expectativas claras",
-                    "Un entorno dinámico y desafiante con problemas complejos que resolver",
-                    "Un entorno flexible e independiente donde puedas expresar tu creatividad",
-                    "Un entorno colaborativo y orientado a una misión, centrado en generar un impacto"
+                    "Recopilar y analizar datos para entender la causa raíz.",
+                    "Hacer una lluvia de ideas de soluciones creativas y poco convencionales.",
+                    "Organizar un equipo y delegar tareas para abordarlo desde múltiples ángulos.",
+                    "Considerar el impacto del problema en los miembros del equipo y los clientes."
                 ]
             },
             {
-                question: "¿Qué tipo de logro te da la mayor satisfacción?",
+                question: "¿Qué te motiva más en una carrera?",
                 options: [
-                    "Alcanzar un objetivo difícil mediante una planificación y ejecución cuidadosas",
-                    "Resolver un problema complejo que nadie más pudo descifrar",
-                    "Crear algo completamente nuevo que sea únicamente tuyo",
-                    "Ver que tu trabajo marca una diferencia tangible y positiva en la vida de las personas"
+                    "El dominio de una habilidad y convertirte en un experto en tu campo.",
+                    "La oportunidad de expresar tu creatividad e innovar.",
+                    "El liderazgo, la influencia y el logro de metas ambiciosas.",
+                    "Ayudar a otros y tener un impacto positivo en la sociedad."
                 ]
             },
             {
-                question: "Si tuvieras que aprender una nueva habilidad, ¿cuál elegirías?",
+                question: "¿Qué tipo de ambiente de trabajo prefieres?",
                 options: [
-                    "Gestión de proyectos o planificación financiera",
-                    "Un lenguaje de programación o ciencia de datos",
-                    "Un instrumento musical o diseño gráfico",
-                    "Psicología o un nuevo idioma para viajar"
+                    "Un entorno tranquilo y estructurado donde puedas concentrarte en tus tareas.",
+                    "Un entorno dinámico y flexible que fomente la experimentación.",
+                    "Un entorno competitivo y orientado a resultados con objetivos claros.",
+                    "Un entorno colaborativo y de apoyo centrado en el trabajo en equipo."
                 ]
             }
         ];
 
         let currentQuestionIndex = 0;
-        let userAnswers = [];
-        let conversationHistory = [];
-        const showdownConverter = new showdown.Converter({
+        const userAnswers = [];
+        const converter = new showdown.Converter({
             simplifiedAutoLink: true,
             strikethrough: true,
             tables: true
         });
 
-        function createQuestionCard(index) {
-            const q = questions[index];
+        document.addEventListener("DOMContentLoaded", () => {
+            renderQuestion(currentQuestionIndex);
+            document.getElementById('skip-quiz-btn').addEventListener('click', showDirectInput);
+            document.getElementById('direct-input-submit-btn').addEventListener('click', handleDirectInputSubmit);
+        });
+
+        function renderQuestion(index) {
+            const quizContainer = document.getElementById('quiz-container');
+            const questionData = questions[index];
             const card = document.createElement('div');
-            card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10';
+            card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
             card.innerHTML = `
-                <div class="text-sm font-semibold text-blue-600 mb-2">Pregunta ${index + 1} de ${questions.length}</div>
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8">${q.question}</h2>
+                <div class="text-right text-sm text-gray-500 mb-4">Pregunta ${index + 1} / ${questions.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6">${questionData.question}</h2>
                 <div class="space-y-4">
-                    ${q.options.map((option, i) => `
-                        <button data-answer-index="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-transparent hover:border-blue-300 p-4 rounded-lg transition">
+                    ${questionData.options.map((option, i) => `
+                        <button data-answer="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg transition">
                             ${option}
                         </button>
                     `).join('')}
-                </div>
-            `;
-            return card;
+                </div>`;
+
+            quizContainer.innerHTML = ''; // Clear previous card
+            quizContainer.appendChild(card);
+
+            // Add event listeners to new buttons
+            card.querySelectorAll('button[data-answer]').forEach(button => {
+                button.addEventListener('click', handleAnswer);
+            });
+            
+            // Trigger animation
+            setTimeout(() => card.classList.remove('card-enter'), 10);
         }
 
-        function handleAnswerSelection(e) {
-            if (!e.target.matches('button[data-answer-index]')) return;
-            userAnswers.push({ question: questions[currentQuestionIndex].question, answer: e.target.innerText });
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                const nextCard = createQuestionCard(currentQuestionIndex);
-                quizContainer.innerHTML = '';
-                quizContainer.appendChild(nextCard);
-            } else {
-                getAnalysis();
-            }
+        function handleAnswer(event) {
+            userAnswers.push(event.target.innerText);
+            const card = document.querySelector('.quiz-card');
+            
+            card.classList.add('card-exit');
+            card.addEventListener('transitionend', () => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    renderQuestion(currentQuestionIndex);
+                } else {
+                    startAnalysis(userAnswers);
+                }
+            }, { once: true });
         }
 
-        function getAnalysis() {
-            const prompt = `Basado en las siguientes preguntas y respuestas, analiza mi personalidad profesional y sugiere 3 roles laborales adecuados con sus razones. Luego, da un breve resumen de mi perfil de personalidad. Finalmente, termina con '¡Ahora puedes hacerme cualquier pregunta de seguimiento!'. Las respuestas deben ser en español. P&R: ${JSON.stringify(userAnswers)}`;
-            fetchResults(prompt, true);
+        function showDirectInput() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('skip-quiz-container').classList.add('hidden');
+            const directInputContainer = document.getElementById('direct-input-container');
+            directInputContainer.classList.remove('hidden');
         }
 
         function handleDirectInputSubmit() {
-            const userInput = directInputText.value.trim();
-            if (userInput) {
-                const prompt = `El usuario busca consejo profesional. Su entrada es: "${userInput}". Proporciona un análisis de carrera completo, sugiere 3 roles laborales adecuados con razones y resume sus fortalezas potenciales. Finalmente, termina con '¡Ahora puedes hacerme cualquier pregunta de seguimiento!'. Tu respuesta debe ser en español.`;
-                fetchResults(prompt, true);
-            } else {
-                alert("Por favor, introduce tus ideas antes de enviar.");
+            const text = document.getElementById('direct-input-text').value.trim();
+            if (text.length < 20) {
+                alert("Para un análisis más profundo, por favor describe tu situación con más detalle (al menos 20 caracteres).");
+                return;
             }
-        }
-        
-        function setupInitialView(){const e=createQuestionCard(0);quizContainer.appendChild(e)}function switchToDirectInput(){quizContainer.classList.add("hidden"),directInputContainer.classList.remove("hidden"),skipQuizContainer.innerHTML=`<button id="show-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">&larr; Volver al Cuestionario</button>`,document.getElementById("show-quiz-btn").addEventListener("click",switchToQuiz)}function switchToQuiz(){directInputContainer.classList.add("hidden"),quizContainer.classList.remove("hidden"),skipQuizContainer.innerHTML=`<button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">¿No quieres responder? Introduce tus ideas directamente &rarr;</button>`,document.getElementById("skip-quiz-btn").addEventListener("click",switchToDirectInput)}
-
-        function showLoading() {
-            viewContainer.innerHTML = `
-                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
-                    <div class="spinner border-4 border-gray-200 border-l-blue-600 rounded-full w-10 h-10 animate-spin"></div>
-                    <p class="mt-4 text-gray-600 font-semibold">La IA está analizando, por favor espera un momento...</p>
-                    <p class="mt-2 text-sm text-gray-500">Esto puede tardar unos 15 segundos.</p>
-                </div>
-            `;
-            skipQuizContainer.classList.add('hidden');
+            startAnalysis(text);
         }
 
-        function displayError(message) {
-             viewContainer.innerHTML = `
-                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
-                    <h2 class="text-2xl font-bold text-red-600">Ocurrió un Error</h2>
-                    <p class="mt-4 text-gray-600">${message}</p>
-                    <button onclick="location.reload()" class="mt-6 bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700">Intentar de Nuevo</button>
-                </div>
-            `;
-        }
+        function startAnalysis(data) {
+            // Hide quiz/input view and show results container
+            document.getElementById('view-container').classList.add('hidden');
+            document.getElementById('skip-quiz-container').classList.add('hidden');
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.classList.remove('hidden');
 
-        async function fetchResults(prompt, isInitial) {
-            showLoading();
-            getTurnstileToken(async (token) => {
-                conversationHistory.push({ role: 'user', content: prompt });
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            turnstileToken: token,
-                            model: 'google/gemini-pro',
-                            messages: conversationHistory,
-                            stream: true
-                        })
-                    });
-
-                    if (!response.ok) throw new Error((await response.json()).error || 'El servidor devolvió un error.');
-                    
-                    if (isInitial) {
-                        viewContainer.classList.add('hidden');
-                        resultsContainer.classList.remove('hidden');
-                    }
-                    
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder();
-                    let fullResponse = "";
-                    let aiMessageDiv;
-
-                    if (!isInitial) {
-                        aiMessageDiv = document.createElement('div');
-                        aiMessageDiv.className = 'p-3 rounded-lg bg-gray-100';
-                        aiMessageDiv.innerHTML = `<div class="font-bold mb-2">Mentor de IA</div><div class="prose max-w-none"></div>`;
-                        chatHistory.appendChild(aiMessageDiv);
-                    }
-
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        if (done) break;
-                        const chunk = decoder.decode(value, { stream: true });
-                        for (const line of chunk.split('\n')) {
-                            if (line.startsWith('data: ')) {
-                                const dataStr = line.substring(5).trim();
-                                if (dataStr === '[DONE]') break;
-                                try {
-                                    const json = JSON.parse(dataStr);
-                                    if (json.choices && json.choices[0].delta && json.choices[0].delta.content) {
-                                        fullResponse += json.choices[0].delta.content;
-                                    }
-                                } catch (e) {}
-                            }
-                        }
-                        if (isInitial) initialResultDiv.innerHTML = `<div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div>`;
-                        else aiMessageDiv.querySelector('.prose').innerHTML = showdownConverter.makeHtml(fullResponse);
-                        chatHistory.scrollTop = chatHistory.scrollHeight;
-                    }
-                    
-                    conversationHistory.push({ role: 'assistant', content: fullResponse });
-
-                    if (isInitial) {
-                         chatHistory.innerHTML = `<div class="p-3 rounded-lg bg-gray-100"><div class="font-bold mb-2">Mentor de IA</div><div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div></div>`;
-                         chatWrapper.classList.remove('hidden');
-                    }
-                    enableChatInput();
-                } catch (error) {
-                    displayError(error.message || "Ocurrió un error desconocido al obtener el análisis.");
-                }
+            const initialResultDiv = document.getElementById('initial-result');
+            initialResultDiv.innerHTML = `
+                <div class="spinner mx-auto mb-4"></div>
+                <h2 class="text-2xl font-bold text-gray-800">Tu mentor de IA está pensando...</h2>
+                <p class="text-gray-600 mt-2">Analizando tus respuestas y generando tu informe de personalidad profesional. Esto puede tardar unos 15 segundos.</p>`;
+            
+            withTurnstileVerification((token) => {
+                fetchAnalysis(data, token, true);
             });
         }
         
-        function handleChatSend(){const e=chatInput.value.trim();if(!e)return;const n=document.createElement("div");n.className="p-3 my-2 text-right",n.innerHTML=`<div class="inline-block p-3 rounded-lg bg-blue-500 text-white"><div class="font-bold mb-2">Tú</div><div>${e}</div></div>`,chatHistory.appendChild(n),chatHistory.scrollTop=chatHistory.scrollHeight,chatInput.value="",disableChatInput(),fetchResults(e,!1)}function disableChatInput(){chatInput.disabled=!0,sendBtn.disabled=!0,sendBtn.innerHTML='<div class="spinner w-5 h-5 mx-auto"></div>'}function enableChatInput(){chatInput.disabled=!1,sendBtn.disabled=!1,sendBtn.innerHTML="&rarr;"}
-        quizContainer.addEventListener('click', handleAnswerSelection);
-        skipQuizBtn.addEventListener('click', switchToDirectInput);
-        directInputSubmitBtn.addEventListener('click', handleDirectInputSubmit);
-        sendBtn.addEventListener('click', handleChatSend);
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleChatSend(); } });
+        let fullReport = "";
 
-        setupInitialView();
+        function fetchAnalysis(data, token, isInitialAnalysis) {
+            const prompt = isInitialAnalysis ? 
+                (Array.isArray(data) ? `Aquí están mis respuestas al cuestionario: ${data.join(', ')}` : data) :
+                `Contexto de la conversación anterior: "${fullReport}"\n\nMi nueva pregunta: "${data}"`;
+
+            let accumulatedContent = "";
+            
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, lang: LANG, turnstileToken: token })
+            })
+            .then(response => {
+                if (!response.body) throw new Error('ReadableStream not available.');
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                const targetDiv = isInitialAnalysis ? document.getElementById('initial-result') : null;
+                const chatHistoryDiv = isInitialAnalysis ? null : document.getElementById('chat-history');
+                let aiMessageContainer;
+
+                if (chatHistoryDiv) {
+                    aiMessageContainer = document.createElement('div');
+                    aiMessageContainer.className = 'mb-4';
+                    aiMessageContainer.innerHTML = '<div class="font-bold text-gray-800 mb-1">Mentor de IA</div><div class="bg-gray-100 p-3 rounded-lg"></div>';
+                    chatHistoryDiv.appendChild(aiMessageContainer);
+                }
+
+                function push() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            if (isInitialAnalysis) {
+                                fullReport = accumulatedContent; // Store the full initial report
+                                showChatInterface();
+                            } else {
+                                fullReport += `\n\nPregunta del usuario: ${data}\nRespuesta de la IA: ${accumulatedContent}`; // Append follow-up to context
+                            }
+                            enableChatInput();
+                            return;
+                        }
+                        accumulatedContent += decoder.decode(value, { stream: true });
+                        const htmlContent = converter.makeHtml(accumulatedContent);
+                        
+                        if (targetDiv) {
+                            targetDiv.innerHTML = htmlContent;
+                        } else if (aiMessageContainer) {
+                            aiMessageContainer.querySelector('.bg-gray-100').innerHTML = htmlContent;
+                            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+                        }
+
+                        push();
+                    }).catch(error => {
+                        console.error('Streaming error:', error);
+                        const errorMsg = "<p class='text-red-500'>Lo sentimos, ocurrió un error al comunicarse con la IA. Por favor, inténtalo de nuevo más tarde.</p>";
+                        if (targetDiv) targetDiv.innerHTML = errorMsg;
+                        if (aiMessageContainer) aiMessageContainer.innerHTML = errorMsg;
+                        enableChatInput();
+                    });
+                }
+                push();
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                const errorMsg = "<p class='text-red-500'>Lo sentimos, ocurrió un error de red. Por favor, revisa tu conexión e inténtalo de nuevo.</p>";
+                if (isInitialAnalysis) {
+                    document.getElementById('initial-result').innerHTML = errorMsg;
+                }
+                 enableChatInput();
+            });
+        }
+
+        function showChatInterface() {
+            document.getElementById('chat-history').innerHTML = `
+                <div class="mb-4">
+                    <div class="font-bold text-gray-800 mb-1">Informe Completo de la IA</div>
+                    <div class="bg-gray-100 p-3 rounded-lg">${converter.makeHtml(fullReport)}</div>
+                </div>`;
+            document.getElementById('chat-wrapper').classList.remove('hidden');
+            document.getElementById('chat-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('send-btn').click();
+                }
+            });
+            document.getElementById('send-btn').addEventListener('click', handleSendMessage);
+            enableChatInput();
+        }
+
+        function handleSendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            disableChatInput();
+            
+            const chatHistory = document.getElementById('chat-history');
+            chatHistory.innerHTML += `
+                <div class="mb-4 text-right">
+                    <div class="font-bold text-blue-600 mb-1">Tú</div>
+                    <div class="bg-blue-100 inline-block p-3 rounded-lg">${message}</div>
+                </div>`;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            input.value = '';
+
+            withTurnstileVerification((token) => {
+                fetchAnalysis(message, token, false);
+            });
+        }
+        
+        function disableChatInput() {
+            document.getElementById('chat-input').disabled = true;
+            document.getElementById('send-btn').disabled = true;
+            document.getElementById('send-btn').innerHTML = '<div class="spinner mx-auto" style="width: 24px; height: 24px; border-width: 3px;"></div>';
+        }
+
+        function enableChatInput() {
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            document.getElementById('send-btn').innerHTML = '&rarr;';
+        }
+
     </script>
 </body>
 </html> 

@@ -225,14 +225,11 @@
     </footer>
 
     <script>
-        // --- CONFIGURATION ---
         const API_URL = "/api/analyze";
-        const LANG = "en"; // Language setting for prompts
-
-        // --- Turnstile State Management ---
+        const LANG = "en";
         let turnstileWidgetId = null;
-        let actionQueue = []; // Stores the function to run after getting a token
-        let isVerificationInProgress = false; // State lock for Turnstile
+        let actionQueue = [];
+        let isVerificationInProgress = false;
 
         window.onTurnstileLoad = function () {
             if (typeof turnstile !== 'undefined') {
@@ -241,361 +238,291 @@
                     callback: function(token) {
                         isVerificationInProgress = false;
                         const action = actionQueue.shift();
-                        if (action) {
-                            action(token);
-                        }
+                        if (action) { action(token); }
                     },
                     'expired-callback': function() {
                         isVerificationInProgress = false;
-                        if (turnstileWidgetId) {
-                            turnstile.reset(turnstileWidgetId);
-                        }
+                        if (turnstileWidgetId) { turnstile.reset(turnstileWidgetId); }
                     },
                     'error-callback': function() {
                         isVerificationInProgress = false;
-                        displayError("Human verification failed. Please refresh the page and try again.");
-                    }
+                        console.error('Turnstile verification failed.');
+                        alert('Security verification failed. Please refresh the page and try again.');
+                    },
+                    size: 'invisible'
                 });
             }
         };
 
-        function getTurnstileToken(callback) {
-            if (isVerificationInProgress) return;
-            actionQueue.push(callback);
-            if (turnstileWidgetId !== null && typeof turnstile !== 'undefined') {
-                isVerificationInProgress = true;
-                try {
-                    turnstile.execute(turnstileWidgetId);
-                } catch (error) {
-                    console.error("Turnstile execution error:", error);
-                    isVerificationInProgress = false;
-                    displayError("Could not start human verification. Please check your connection or browser settings.");
-                }
-            } else {
-                console.error("Turnstile is not ready.");
-                displayError("Verification service is not ready. Please wait a moment and try again.");
-            }
+        function withTurnstileVerification(action) {
+            if (isVerificationInProgress) { return; }
+            actionQueue.push(action);
+            isVerificationInProgress = true;
+            if (turnstileWidgetId) { turnstile.execute(turnstileWidgetId); }
         }
-        
-        // --- DOM Elements ---
-        const quizContainer = document.getElementById('quiz-container');
-        const directInputContainer = document.getElementById('direct-input-container');
-        const skipQuizBtn = document.getElementById('skip-quiz-btn');
-        const skipQuizContainer = document.getElementById('skip-quiz-container');
-        const directInputText = document.getElementById('direct-input-text');
-        const directInputSubmitBtn = document.getElementById('direct-input-submit-btn');
-        const viewContainer = document.getElementById('view-container');
-        const resultsContainer = document.getElementById('results-container');
-        const initialResultDiv = document.getElementById('initial-result');
-        const chatWrapper = document.getElementById('chat-wrapper');
-        const chatHistory = document.getElementById('chat-history');
-        const chatInput = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
-        const additionalContent = document.getElementById('additional-content');
-        
-        // --- Quiz Questions and Logic ---
+
         const questions = [
             {
-                question: "If you had a free afternoon, what would you most likely do?",
+                question: "Imagine you are at a casual party. Which activity would you most likely be drawn to?",
                 options: [
-                    "Organize and plan your week",
-                    "Tinker with a new gadget or solve a puzzle",
-                    "Express yourself through art, music, or writing",
-                    "Help a friend with a problem or volunteer"
+                    "Engaging in a deep, one-on-one conversation with a close friend.",
+                    "People-watching and analyzing the social dynamics.",
+                    "Participating in a lively board game or group activity.",
+                    "Helping the host with organizing food or making sure everyone is having a good time."
                 ]
             },
             {
-                question: "When working on a team project, what role do you naturally take on?",
+                question: "If you had an entirely free weekend, how would you ideally spend it?",
                 options: [
-                    "The leader who delegates tasks and sets the vision",
-                    "The analyst who examines data and ensures accuracy",
-                    "The creative who brainstorms new and unconventional ideas",
-                    "The supporter who ensures everyone is heard and collaborates smoothly"
+                    "Reading a book, learning a new skill, or watching a documentary.",
+                    "Creating something: writing, drawing, making music, or a DIY project.",
+                    "Going for a hike, playing a sport, or doing some other outdoor physical activity.",
+                    "Spending quality time with family or friends."
                 ]
             },
             {
-                question: "Which of these working environments sounds most appealing?",
+                question: "When faced with a complex problem at work, what is your initial approach?",
                 options: [
-                    "A structured, stable environment with clear expectations",
-                    "A dynamic, challenging environment with complex problems to solve",
-                    "A flexible, independent environment where you can express your creativity",
-                    "A collaborative, mission-driven environment focused on making an impact"
+                    "Gathering and analyzing data to understand the root cause.",
+                    "Brainstorming creative and unconventional solutions.",
+                    "Organizing a team and delegating tasks to tackle it from multiple angles.",
+                    "Considering the impact of the problem on team members and customers."
                 ]
             },
             {
-                question: "What kind of accomplishment gives you the most satisfaction?",
+                question: "What motivates you the most in a career?",
                 options: [
-                    "Achieving a difficult goal through careful planning and execution",
-                    "Solving a complex problem that no one else could figure out",
-                    "Creating something entirely new that is uniquely yours",
-                    "Seeing your work make a tangible, positive difference in people's lives"
+                    "Mastery of a skill and becoming an expert in your field.",
+                    "The opportunity to express creativity and innovate.",
+                    "Leadership, influence, and achieving ambitious goals.",
+                    "Helping others and making a positive impact on society."
                 ]
             },
             {
-                question: "If you were to learn a new skill, which would you choose?",
+                question: "What kind of work environment do you prefer?",
                 options: [
-                    "Project management or financial planning",
-                    "A programming language or data science",
-                    "A musical instrument or graphic design",
-                    "Psychology or a new language for travel"
+                    "A quiet, structured environment where you can focus on your tasks.",
+                    "A dynamic, flexible environment that encourages experimentation.",
+                    "A competitive, results-driven environment with clear targets.",
+                    "A collaborative, supportive environment focused on teamwork."
                 ]
             }
         ];
 
         let currentQuestionIndex = 0;
-        let userAnswers = [];
-        let conversationHistory = [];
-        const showdownConverter = new showdown.Converter({
+        const userAnswers = [];
+        const converter = new showdown.Converter({
             simplifiedAutoLink: true,
             strikethrough: true,
             tables: true
         });
 
-        function createQuestionCard(index) {
-            const q = questions[index];
+        document.addEventListener("DOMContentLoaded", () => {
+            renderQuestion(currentQuestionIndex);
+            document.getElementById('skip-quiz-btn').addEventListener('click', showDirectInput);
+            document.getElementById('direct-input-submit-btn').addEventListener('click', handleDirectInputSubmit);
+        });
+
+        function renderQuestion(index) {
+            const quizContainer = document.getElementById('quiz-container');
+            const questionData = questions[index];
             const card = document.createElement('div');
             card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
             card.innerHTML = `
-                <div class="text-sm font-semibold text-blue-600 mb-2">Question ${index + 1} of ${questions.length}</div>
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8">${q.question}</h2>
+                <div class="text-right text-sm text-gray-500 mb-4">Question ${index + 1} / ${questions.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6">${questionData.question}</h2>
                 <div class="space-y-4">
-                    ${q.options.map((option, i) => `
-                        <button data-answer-index="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-transparent hover:border-blue-300 p-4 rounded-lg transition">
+                    ${questionData.options.map((option, i) => `
+                        <button data-answer="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg transition">
                             ${option}
                         </button>
                     `).join('')}
-                </div>
-            `;
+                </div>`;
+
+            quizContainer.innerHTML = ''; // Clear previous card
+            quizContainer.appendChild(card);
+
+            // Add event listeners to new buttons
+            card.querySelectorAll('button[data-answer]').forEach(button => {
+                button.addEventListener('click', handleAnswer);
+            });
+            
+            // Trigger animation
             setTimeout(() => card.classList.remove('card-enter'), 10);
-            return card;
         }
 
-        function handleAnswerSelection(e) {
-            if (!e.target.matches('button[data-answer-index]')) return;
+        function handleAnswer(event) {
+            userAnswers.push(event.target.innerText);
+            const card = document.querySelector('.quiz-card');
             
-            const selectedOptionText = e.target.innerText;
-            userAnswers.push({ question: questions[currentQuestionIndex].question, answer: selectedOptionText });
-
-            const currentCard = quizContainer.firstChild;
-            currentCard.classList.add('card-exit');
-
-            currentCard.addEventListener('transitionend', () => {
+            card.classList.add('card-exit');
+            card.addEventListener('transitionend', () => {
                 currentQuestionIndex++;
                 if (currentQuestionIndex < questions.length) {
-                    const nextCard = createQuestionCard(currentQuestionIndex);
-                    quizContainer.innerHTML = '';
-                    quizContainer.appendChild(nextCard);
+                    renderQuestion(currentQuestionIndex);
                 } else {
-                    getAnalysis();
+                    startAnalysis(userAnswers);
                 }
             }, { once: true });
         }
 
-        function getAnalysis() {
-            const prompt = `Based on the following Q&A, please analyze my career personality and suggest 3 suitable job roles with reasons. Then, give a brief summary of my personality profile. Finally, end with 'You can now ask me any follow-up questions!'. Answers should be in English. Q&A: ${JSON.stringify(userAnswers)}`;
-            fetchResults(prompt, true);
+        function showDirectInput() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('skip-quiz-container').classList.add('hidden');
+            const directInputContainer = document.getElementById('direct-input-container');
+            directInputContainer.classList.remove('hidden');
         }
 
         function handleDirectInputSubmit() {
-            const userInput = directInputText.value.trim();
-            if (userInput) {
-                const prompt = `The user is seeking career advice. Their input is: "${userInput}". Please provide a comprehensive career analysis, suggest 3 suitable job roles with reasons, and summarize their potential strengths. Finally, end with 'You can now ask me any follow-up questions!'. Your response must be in English.`;
-                fetchResults(prompt, true);
-            } else {
-                alert("Please enter your thoughts before submitting.");
+            const text = document.getElementById('direct-input-text').value.trim();
+            if (text.length < 20) {
+                alert("For a more in-depth analysis, please describe your situation in more detail (at least 20 characters).");
+                return;
             }
+            startAnalysis(text);
         }
 
-        function setupInitialView() {
-            const firstCard = createQuestionCard(0);
-            quizContainer.appendChild(firstCard);
-        }
-        
-        function switchToDirectInput() {
-            const currentCard = quizContainer.firstChild;
-            if(currentCard) {
-                currentCard.classList.add('card-exit');
-                currentCard.addEventListener('transitionend', () => {
-                    quizContainer.classList.add('hidden');
-                    directInputContainer.classList.remove('hidden');
-                    directInputContainer.classList.add('card-enter');
-                    setTimeout(() => directInputContainer.classList.remove('card-enter'), 10);
-                }, { once: true });
-            } else {
-                quizContainer.classList.add('hidden');
-                directInputContainer.classList.remove('hidden');
-            }
+        function startAnalysis(data) {
+            // Hide quiz/input view and show results container
+            document.getElementById('view-container').classList.add('hidden');
+            document.getElementById('skip-quiz-container').classList.add('hidden');
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.classList.remove('hidden');
+
+            const initialResultDiv = document.getElementById('initial-result');
+            initialResultDiv.innerHTML = `
+                <div class="spinner mx-auto mb-4"></div>
+                <h2 class="text-2xl font-bold text-gray-800">Your AI mentor is thinking...</h2>
+                <p class="text-gray-600 mt-2">Analyzing your answers and generating your career personality report. This may take about 15 seconds.</p>`;
             
-            skipQuizContainer.innerHTML = `<button id="show-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">&larr; Back to Quiz</button>`;
-            document.getElementById('show-quiz-btn').addEventListener('click', switchToQuiz);
-        }
-
-        function switchToQuiz() {
-            directInputContainer.classList.add('card-exit');
-            directInputContainer.addEventListener('transitionend', () => {
-                directInputContainer.classList.add('hidden');
-                quizContainer.classList.remove('hidden');
-                const card = quizContainer.firstChild || createQuestionCard(currentQuestionIndex);
-                if(!quizContainer.firstChild) quizContainer.appendChild(card);
-                card.classList.remove('card-exit');
-                card.classList.add('card-enter');
-                setTimeout(() => card.classList.remove('card-enter'), 10);
-            }, { once: true });
-
-            skipQuizContainer.innerHTML = `<button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">Don't want to answer questions? Input your thoughts directly &rarr;</button>`;
-            document.getElementById('skip-quiz-btn').addEventListener('click', switchToDirectInput);
-        }
-
-        function showLoading() {
-            viewContainer.innerHTML = `
-                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
-                    <div class="spinner"></div>
-                    <p class="mt-4 text-gray-600 font-semibold">AI is analyzing, please wait a moment...</p>
-                    <p class="mt-2 text-sm text-gray-500">This may take about 15 seconds.</p>
-                </div>
-            `;
-            skipQuizContainer.classList.add('hidden');
-            additionalContent.classList.add('hidden');
-        }
-
-        function displayError(message) {
-             viewContainer.innerHTML = `
-                <div class="text-center bg-white rounded-xl shadow-lg p-10 min-h-[32rem] flex flex-col justify-center items-center">
-                    <h2 class="text-2xl font-bold text-red-600">An Error Occurred</h2>
-                    <p class="mt-4 text-gray-600">${message}</p>
-                    <button onclick="location.reload()" class="mt-6 bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700">Try Again</button>
-                </div>
-            `;
-        }
-
-        async function fetchResults(prompt, isInitial) {
-            showLoading();
-            getTurnstileToken(async (token) => {
-                conversationHistory.push({ role: 'user', content: prompt });
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            turnstileToken: token,
-                            model: 'google/gemini-pro',
-                            messages: conversationHistory,
-                            stream: true
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || 'The server returned an error.');
-                    }
-                    
-                    if (isInitial) {
-                        viewContainer.classList.add('hidden');
-                        resultsContainer.classList.remove('hidden');
-                        additionalContent.classList.remove('hidden');
-                    }
-                    
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder();
-                    let fullResponse = "";
-                    
-                    let aiMessageDiv;
-                    if (!isInitial) {
-                        aiMessageDiv = document.createElement('div');
-                        aiMessageDiv.className = 'p-3 rounded-lg bg-gray-100';
-                        aiMessageDiv.innerHTML = `<div class="font-bold mb-2">AI Mentor</div><div class="prose max-w-none"></div>`;
-                        chatHistory.appendChild(aiMessageDiv);
-                    }
-
-                    while (true) {
-                        const { value, done } = await reader.read();
-                        if (done) break;
-                        
-                        const chunk = decoder.decode(value, { stream: true });
-                        const lines = chunk.split('\n');
-                        
-                        for (const line of lines) {
-                            if (line.startsWith('data: ')) {
-                                const dataStr = line.substring(5).trim();
-                                if (dataStr === '[DONE]') break;
-                                try {
-                                    const json = JSON.parse(dataStr);
-                                    if (json.choices && json.choices[0].delta && json.choices[0].delta.content) {
-                                        fullResponse += json.choices[0].delta.content;
-                                    }
-                                } catch (e) {
-                                    // Sometimes a chunk might not be a full JSON object, so we ignore parse errors and continue
-                                }
-                            }
-                        }
-                        
-                        if (isInitial) {
-                            initialResultDiv.innerHTML = `<div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div>`;
-                        } else {
-                            aiMessageDiv.querySelector('.prose').innerHTML = showdownConverter.makeHtml(fullResponse);
-                        }
-                        chatHistory.scrollTop = chatHistory.scrollHeight;
-                    }
-                    
-                    conversationHistory.push({ role: 'assistant', content: fullResponse });
-
-                    if (isInitial) {
-                         const initialReportHtml = `<div class="p-3 rounded-lg bg-gray-100"><div class="font-bold mb-2">AI Mentor</div><div class="prose max-w-none">${showdownConverter.makeHtml(fullResponse)}</div></div>`;
-                         chatHistory.innerHTML = initialReportHtml;
-                         chatWrapper.classList.remove('hidden');
-                    }
-                    
-                    enableChatInput();
-
-                } catch (error) {
-                    console.error('Fetch error:', error);
-                    displayError(error.message || "An unknown error occurred while fetching the analysis.");
-                }
+            withTurnstileVerification((token) => {
+                fetchAnalysis(data, token, true);
             });
         }
         
-        function handleChatSend() {
-            const message = chatInput.value.trim();
-            if (!message) return;
+        let fullReport = "";
+
+        function fetchAnalysis(data, token, isInitialAnalysis) {
+            const prompt = isInitialAnalysis ? 
+                (Array.isArray(data) ? `Here are my answers to the quiz: ${data.join(', ')}` : data) :
+                `Previous conversation context: "${fullReport}"\n\nMy new question: "${data}"`;
+
+            let accumulatedContent = "";
             
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.className = 'p-3 my-2 text-right';
-            userMessageDiv.innerHTML = `<div class="inline-block p-3 rounded-lg bg-blue-500 text-white"><div class="font-bold mb-2">You</div><div>${message}</div></div>`;
-            chatHistory.appendChild(userMessageDiv);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-            
-            chatInput.value = '';
-            disableChatInput();
-            
-            fetchResults(message, false);
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, lang: LANG, turnstileToken: token })
+            })
+            .then(response => {
+                if (!response.body) throw new Error('ReadableStream not available.');
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                const targetDiv = isInitialAnalysis ? document.getElementById('initial-result') : null;
+                const chatHistoryDiv = isInitialAnalysis ? null : document.getElementById('chat-history');
+                let aiMessageContainer;
+
+                if (chatHistoryDiv) {
+                    aiMessageContainer = document.createElement('div');
+                    aiMessageContainer.className = 'mb-4';
+                    aiMessageContainer.innerHTML = '<div class="font-bold text-gray-800 mb-1">AI Mentor</div><div class="bg-gray-100 p-3 rounded-lg"></div>';
+                    chatHistoryDiv.appendChild(aiMessageContainer);
+                }
+
+                function push() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            if (isInitialAnalysis) {
+                                fullReport = accumulatedContent; // Store the full initial report
+                                showChatInterface();
+                            } else {
+                                fullReport += `\n\nUser question: ${data}\nAI answer: ${accumulatedContent}`; // Append follow-up to context
+                            }
+                            enableChatInput();
+                            return;
+                        }
+                        accumulatedContent += decoder.decode(value, { stream: true });
+                        const htmlContent = converter.makeHtml(accumulatedContent);
+                        
+                        if (targetDiv) {
+                            targetDiv.innerHTML = htmlContent;
+                        } else if (aiMessageContainer) {
+                            aiMessageContainer.querySelector('.bg-gray-100').innerHTML = htmlContent;
+                            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+                        }
+
+                        push();
+                    }).catch(error => {
+                        console.error('Streaming error:', error);
+                        const errorMsg = "<p class='text-red-500'>Sorry, an error occurred while communicating with the AI. Please try again later.</p>";
+                        if (targetDiv) targetDiv.innerHTML = errorMsg;
+                        if (aiMessageContainer) aiMessageContainer.innerHTML = errorMsg;
+                        enableChatInput();
+                    });
+                }
+                push();
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                const errorMsg = "<p class='text-red-500'>Sorry, a network error occurred. Please check your connection and try again.</p>";
+                if (isInitialAnalysis) {
+                    document.getElementById('initial-result').innerHTML = errorMsg;
+                }
+                 enableChatInput();
+            });
         }
 
+        function showChatInterface() {
+            document.getElementById('chat-history').innerHTML = `
+                <div class="mb-4">
+                    <div class="font-bold text-gray-800 mb-1">Full AI Report</div>
+                    <div class="bg-gray-100 p-3 rounded-lg">${converter.makeHtml(fullReport)}</div>
+                </div>`;
+            document.getElementById('chat-wrapper').classList.remove('hidden');
+            document.getElementById('chat-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('send-btn').click();
+                }
+            });
+            document.getElementById('send-btn').addEventListener('click', handleSendMessage);
+            enableChatInput();
+        }
+
+        function handleSendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            disableChatInput();
+            
+            const chatHistory = document.getElementById('chat-history');
+            chatHistory.innerHTML += `
+                <div class="mb-4 text-right">
+                    <div class="font-bold text-blue-600 mb-1">You</div>
+                    <div class="bg-blue-100 inline-block p-3 rounded-lg">${message}</div>
+                </div>`;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            input.value = '';
+
+            withTurnstileVerification((token) => {
+                fetchAnalysis(message, token, false);
+            });
+        }
+        
         function disableChatInput() {
-            chatInput.disabled = true;
-            sendBtn.disabled = true;
-            sendBtn.innerHTML = '<div class="spinner w-5 h-5 mx-auto"></div>';
+            document.getElementById('chat-input').disabled = true;
+            document.getElementById('send-btn').disabled = true;
+            document.getElementById('send-btn').innerHTML = '<div class="spinner mx-auto" style="width: 24px; height: 24px; border-width: 3px;"></div>';
         }
 
         function enableChatInput() {
-            chatInput.disabled = false;
-            sendBtn.disabled = false;
-            sendBtn.innerHTML = '&rarr;';
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            document.getElementById('send-btn').innerHTML = '&rarr;';
         }
-
-        // --- Event Listeners ---
-        quizContainer.addEventListener('click', handleAnswerSelection);
-        skipQuizBtn.addEventListener('click', switchToDirectInput);
-        directInputSubmitBtn.addEventListener('click', handleDirectInputSubmit);
-        sendBtn.addEventListener('click', handleChatSend);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleChatSend();
-            }
-        });
-
-        // --- Initializer ---
-        setupInitialView();
 
     </script>
 </body>

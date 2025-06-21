@@ -3,254 +3,443 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>キャリアテスト - キャリアコンパス</title>
-    <meta name="description" content="インタラクティブなキャリアテストを開始します。一連の質問に答えて、パーソナライズされたAIキャリア分析を受け取るか、直接あなたの状況を説明してください。">
-    <meta name="robots" content="noindex, follow">
+    <title>テストを開始 | キャリアコンパス</title>
+    <meta name="description" content="5つの精心に設計された質問に答えるだけで、AIが生成した詳細なキャリアパーソナリティ分析レポートを即座に受け取り、あなたのキャリア探求の旅を始めましょう。">
+    <meta name="keywords" content="キャリアテスト, 性格分析, AIキャリアアドバイザー, キャリアの方向性, キャリアコンパス, オンラインクイズ">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://jobhelp.online/ja/quiz.html">
+
+    <!-- Hreflang for SEO -->
     <link rel="alternate" hreflang="zh" href="https://jobhelp.online/quiz.html">
     <link rel="alternate" hreflang="en" href="https://jobhelp.online/en/quiz.html">
     <link rel="alternate" hreflang="es" href="https://jobhelp.online/es/quiz.html">
     <link rel="alternate" hreflang="de" href="https://jobhelp.online/de/quiz.html">
     <link rel="alternate" hreflang="fr" href="https://jobhelp.online/fr/quiz.html">
     <link rel="alternate" hreflang="ja" href="https://jobhelp.online/ja/quiz.html">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <link rel="stylesheet" href="../styles.css">
-</head>
-<body class="bg-gray-100 flex flex-col min-h-screen">
+    <link rel="alternate" hreflang="x-default" href="https://jobhelp.online/quiz.html">
 
-    <header class="bg-white shadow-md w-full">
-        <nav class="container mx-auto px-6 py-4">
-            <a href="index.html" class="text-xl font-bold text-gray-800">キャリアコンパス</a>
-        </nav>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jobhelp.online/ja/quiz.html">
+    <meta property="og:title" content="テストを開始 | キャリアコンパス">
+    <meta property="og:description" content="5つの精心に設計された質問に答えるだけで、AIが生成した詳細なキャリアパーソナリティ分析レポートを即座に受け取れます。">
+    <meta property="og:image" content="https://jobhelp.online/og-image.png">
+    <meta property="og:site_name" content="キャリアコンパス">
+    <meta property="og:locale" content="ja_JP">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://jobhelp.online/ja/quiz.html">
+    <meta name="twitter:title" content="テストを開始 | キャリアコンパス">
+    <meta name="twitter:description" content="5つの精心に設計された質問に答えるだけで、AIが生成した詳細なキャリアパーソナリティ分析レポートを即座に受け取れます。">
+    <meta name="twitter:image" content="https://jobhelp.online/og-image.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <!-- Turnstile Script -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script>
+    <style>
+        .quiz-card, #direct-input-container {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0) scale(1);
+            opacity: 1;
+            will-change: transform, opacity;
+            min-height: 32rem;
+        }
+        .card-enter { transform: translateX(100%) scale(0.9); opacity: 0; }
+        .card-exit { transform: translateX(-100%) scale(0.9); opacity: 0; }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #09f; animation: spin 1s ease infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "このテストと分析は無料ですか？",
+            "acceptedAnswer": { "@type": "Answer", "text": "はい、完全に無料です。私たちはAI技術を通じて、将来に悩むより多くの人々を支援することに尽力しています。使用しているモデルの一部はOpenRouterのようなプラットフォームから無料枠で提供されており、その価値をお客様に還元しています。" }
+        }, {
+            "@type": "Question",
+            "name": "私のデータや個人情報は安全ですか？",
+            "acceptedAnswer": { "@type": "Answer", "text": "私たちはあなたのプライバシーを非常に重視しています。あなたの回答やAIとの会話は匿名であり、現在の分析と対話にのみ使用されます。他の目的で保存または使用することはありません。" }
+        }]
+    }
+    </script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <header class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/ja/" class="text-xl font-bold text-gray-900">キャリアコンパス</a>
+            <a href="/ja/" class="text-sm font-semibold text-gray-600 hover:text-blue-600">&larr; ホームに戻る</a>
+        </div>
     </header>
 
-    <main id="quiz-container" class="container mx-auto p-6 flex-grow flex flex-col justify-center">
-        <!-- Quiz content will be injected here -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4">
+        <div id="view-container" class="w-full max-w-2xl mx-auto">
+            <div id="quiz-container"></div>
+            <div id="direct-input-container" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">AIメンターに直接相談する</h2>
+                <p class="text-gray-600 mb-6">あなたの悩み、考え、または自己紹介を以下に入力してください。AIがあなたに合わせたキャリアプランニングレポートを生成します。</p>
+                <textarea id="direct-input-text" rows="8" placeholder="例：私はマーケティング専攻の学生ですが、内向的で社交が苦手だと感じています。将来について悩んでおり、何ができるかわかりません..." class="w-full border rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                <button id="direct-input-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-6">AIに分析してもらう</button>
+            </div>
+        </div>
+        <div id="skip-quiz-container" class="text-center mt-6">
+            <button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">質問に答えたくないですか？直接入力する &rarr;</button>
+        </div>
+        <div id="results-container" class="w-full max-w-3xl mx-auto hidden">
+            <div id="initial-result" class="text-center bg-white rounded-xl shadow-lg p-6 md:p-10"></div>
+            <div id="chat-wrapper" class="hidden mt-6 bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">AIメンターとの詳細な対話</h2>
+                <div id="chat-history" class="h-[50vh] overflow-y-auto pr-4 mb-4 border-b"></div>
+                <div id="chat-input-container" class="flex items-center pt-4">
+                    <input type="text" id="chat-input" placeholder="他に質問はありますか？こちらへ入力..." class="flex-grow border rounded-l-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="send-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-r-lg hover:bg-blue-700 transition">&rarr;</button>
+                </div>
+            </div>
+        </div>
+        <section id="additional-content" class="w-full mt-16 mb-16">
+            <div class="container mx-auto px-6">
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">彼らがどのように方向性を見つけたか</h2>
+                    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <blockquote class="text-gray-600"><p>「私はずっと内向的な性格がマーケティング専攻に合わないと思っていました。AIメンターと話した後、専門知識を活かしつつ社交が少なくても済む『データアナリスト（マーケティング）』という職種を教えてくれました。私にぴったりです！」</p></blockquote>
+                            <p class="mt-4 font-semibold text-gray-900">- 佐藤さん（大学3年生）</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <blockquote class="text-gray-600"><p>「3年間働いて、毎日同じことの繰り返しで情熱を失っていました。『キャリアコンパス』を通じて、自分の原動力が『創造性』と『自律性』にあると気づきました。今は空き時間に自分の小さなプロダクトを開発していて、人生に希望が持てるようになりました。」</p></blockquote>
+                            <p class="mt-4 font-semibold text-gray-900">- 鈴木さん（若手社会人）</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">よくある質問</h2>
+                    <div class="space-y-4">
+                        <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
+                            <summary class="flex justify-between items-center font-semibold text-gray-900">このテストと分析は無料ですか？<svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+                            <p class="mt-3 text-gray-600">はい、完全に無料です。私たちはAI技術を通じて、将来に悩むより多くの人々を支援することに尽力しています。使用しているモデルの一部はOpenRouterのようなプラットフォームから無料枠で提供されており、その価値をお客様に還元しています。</p>
+                        </details>
+                        <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
+                            <summary class="flex justify-between items-center font-semibold text-gray-900">私のデータや個人情報は安全ですか？<svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+                            <p class="mt-3 text-gray-600">私たちはあなたのプライバシーを非常に重視しています。あなたの回答やAIとの会話は匿名であり、現在の分析と対話にのみ使用されます。他の目的で保存または使用することはありません。</p>
+                        </details>
+                    </div>
+                </div>
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">ご提案やフィードバックがありますか？</h2>
+                     <p class="text-gray-600 mb-6">製品をより良くするために、皆様の声をお聞かせください。</p>
+                     <a href="mailto:feedback@jobhelp.online" class="bg-gray-900 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-gray-700 transition">お問い合わせ</a>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <div id="chat-container" class="container mx-auto p-6 flex-grow flex-col justify-center" style="display: none;">
-        <div id="chat-box" class="flex-grow bg-white p-4 rounded-lg shadow-inner overflow-y-auto mb-4 h-96">
-            <!-- Chat messages will appear here -->
-        </div>
-        <div class="flex">
-            <input type="text" id="chat-input" class="flex-grow border rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="レポートについて質問する...">
-            <button id="chat-submit" class="bg-blue-600 text-white px-4 rounded-r-lg hover:bg-blue-700 disabled:bg-blue-300">送信</button>
-        </div>
-    </div>
-    
-    <footer class="bg-white mt-auto w-full">
-        <div class="container mx-auto px-6 py-4 text-center text-gray-600">
-            <p>&copy; 2025 キャリアコンパス. All rights reserved.</p>
-        </div>
+    <div id="turnstile-container"></div>
+    <footer class="w-full py-6 text-center bg-white/50 border-t">
+        <p class="text-sm text-gray-500">&copy; 2025 キャリアコンパス. All rights reserved.</p>
     </footer>
 
     <script>
-        const quizContainer = document.getElementById('quiz-container');
-        const chatContainer = document.getElementById('chat-container');
-        const chatBox = document.getElementById('chat-box');
-        const chatInput = document.getElementById('chat-input');
-        const chatSubmit = document.getElementById('chat-submit');
-        const converter = new showdown.Converter({simplifiedAutoLink: true, openLinksInNewWindow: true, strikethrough: true});
-        
-        let turnstileToken = null;
-        let turnstileRetries = 0;
-        const MAX_RETRIES = 3;
+        const API_URL = "/api/analyze";
+        const LANG = "ja";
+        let turnstileWidgetId = null;
+        let actionQueue = [];
+        let isVerificationInProgress = false;
+
+        window.onTurnstileLoad = function () {
+            if (typeof turnstile !== 'undefined') {
+                turnstileWidgetId = turnstile.render('#turnstile-container', {
+                    sitekey: '0x4AAAAAABhyfTjwR6RXipd_', 
+                    callback: function(token) {
+                        isVerificationInProgress = false;
+                        const action = actionQueue.shift();
+                        if (action) { action(token); }
+                    },
+                    'expired-callback': function() {
+                        isVerificationInProgress = false;
+                        turnstile.reset();
+                    },
+                    'error-callback': function() {
+                        isVerificationInProgress = false;
+                        console.error('Turnstile verification failed.');
+                        alert('セキュリティ認証に失敗しました。ページを再読み込みして、もう一度お試しください。');
+                    },
+                    size: 'invisible'
+                });
+            }
+        };
+
+        function withTurnstileVerification(action) {
+            if (isVerificationInProgress) { return; }
+            actionQueue.push(action);
+            isVerificationInProgress = true;
+            if (turnstileWidgetId) { turnstile.execute(turnstileWidgetId); }
+        }
 
         const questions = [
-            "次の仕事で最も得たいものは何ですか？",
-            "どのような職場環境で最もエネルギーを感じ、熱中できますか？",
-            "時間を忘れるほど夢中になった仕事やプロジェクトについて説明してください。",
-            "もしお金の心配がなかったら、自分の時間を何に使いますか？",
-            "理想的なワークライフバランスについて、どのように考えますか？"
+            {
+                question: "気軽なパーティーに参加していると想像してください。どの活動に最も惹かれますか？",
+                options: [
+                    "少人数の親しい友人と深い話をする。",
+                    "人間観察をして、人々の力学を分析する。",
+                    "ボードゲームや活発なグループ活動に参加する。",
+                    "主催者を手伝って食べ物を準備したり、皆が楽しんでいるか確認したりする。"
+                ]
+            },
+            {
+                question: "完全に自由な週末があったら、理想的にはどのように過ごしますか？",
+                options: [
+                    "本を読んだり、新しいスキルを学んだり、ドキュメンタリーを見たりする。",
+                    "何かを創作する：文章を書く、絵を描く、音楽を作る、またはDIYプロジェクトに取り組む。",
+                    "ハイキング、スポーツ、またはその他の屋外での身体活動をする。",
+                    "家族や友人と質の高い時間を過ごす。"
+                ]
+            },
+            {
+                question: "職場で複雑な問題に直面したとき、あなたの最初のアプローチは何ですか？",
+                options: [
+                    "問題の根本原因を理解するためにデータを収集し、分析する。",
+                    "創造的で型にはまらない解決策をブレインストーミングする。",
+                    "チームを組織し、タスクを委任して多角的に問題に取り組む。",
+                    "問題がチームメンバーや顧客に与える影響を考慮する。"
+                ]
+            },
+            {
+                question: "キャリアにおいて、何があなたを最もやる気にさせますか？",
+                options: [
+                    "スキルを習得し、その分野の専門家になること。",
+                    "創造性を表現し、革新する機会。",
+                    "リーダーシップを発揮し、影響力を持ち、野心的な目標を達成すること。",
+                    "他人を助け、社会にポジティブな影響を与えること。"
+                ]
+            },
+            {
+                question: "どのような職場環境を好みますか？",
+                options: [
+                    "自分の仕事に集中できる、静かで構造化された環境。",
+                    "実験を奨励する、柔軟でダイナミックな環境。",
+                    "明確な目標がある、競争力があり結果重視の環境。",
+                    "チームワークを重視する、協力的で支援的な環境。"
+                ]
+            }
         ];
+
         let currentQuestionIndex = 0;
-        let answers = [];
+        const userAnswers = [];
+        const converter = new showdown.Converter({
+            simplifiedAutoLink: true,
+            strikethrough: true,
+            tables: true
+        });
 
-        function renderQuestion() {
-            if (currentQuestionIndex < questions.length) {
-                quizContainer.innerHTML = `
-                    <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-2xl mx-auto">
-                        <p class="text-2xl font-semibold mb-6">${questions[currentQuestionIndex]}</p>
-                        <textarea id="answer-input" class="w-full p-2 border rounded mb-6" rows="4" placeholder="あなたの回答..."></textarea>
-                        <button id="next-btn" class="bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold apple-button">次へ</button>
-                        <p class="text-sm text-gray-500 mt-4">${currentQuestionIndex + 1} / ${questions.length}</p>
-                    </div>
-                `;
-                document.getElementById('next-btn').addEventListener('click', handleNext);
-            } else {
-                showAnalysisOptions();
-            }
+        document.addEventListener("DOMContentLoaded", () => {
+            renderQuestion(currentQuestionIndex);
+            document.getElementById('skip-quiz-btn').addEventListener('click', showDirectInput);
+            document.getElementById('direct-input-submit-btn').addEventListener('click', handleDirectInputSubmit);
+        });
+
+        function renderQuestion(index) {
+            const quizContainer = document.getElementById('quiz-container');
+            const questionData = questions[index];
+            const card = document.createElement('div');
+            card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
+            card.innerHTML = `
+                <div class="text-right text-sm text-gray-500 mb-4">質問 ${index + 1} / ${questions.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6">${questionData.question}</h2>
+                <div class="space-y-4">
+                    ${questionData.options.map((option, i) => `
+                        <button data-answer="${i}" class="w-full text-left bg-gray-100 hover:bg-blue-100 border border-gray-200 text-gray-800 font-semibold py-3 px-5 rounded-lg transition">
+                            ${option}
+                        </button>
+                    `).join('')}
+                </div>`;
+
+            quizContainer.innerHTML = '';
+            quizContainer.appendChild(card);
+
+            card.querySelectorAll('button[data-answer]').forEach(button => {
+                button.addEventListener('click', handleAnswer);
+            });
+            
+            setTimeout(() => card.classList.remove('card-enter'), 10);
         }
 
-        function handleNext() {
-            const answer = document.getElementById('answer-input').value.trim();
-            if (answer) {
-                answers.push(`質問 ${currentQuestionIndex + 1}: ${questions[currentQuestionIndex]}\n回答: ${answer}`);
+        function handleAnswer(event) {
+            userAnswers.push(event.target.innerText);
+            const card = document.querySelector('.quiz-card');
+            
+            card.classList.add('card-exit');
+            card.addEventListener('transitionend', () => {
                 currentQuestionIndex++;
-                renderQuestion();
-            } else {
-                alert('回答を入力してください。');
-            }
-        }
-
-        function showAnalysisOptions() {
-            quizContainer.innerHTML = `
-                <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-2xl mx-auto">
-                    <h2 class="text-3xl font-bold mb-4">分析の準備ができました</h2>
-                    <p class="text-gray-600 mb-6">回答をいただきました。クイズに基づいた分析のために送信するか、これをスキップしてキャリア状況を直接説明し、パーソナライズされた分析を受けることができます。</p>
-                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAAcF3d22Nae41Y3g" data-callback="onTurnstileSuccess"></div>
-                    <div class="flex justify-center gap-4 mt-6">
-                        <button id="submit-quiz" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg apple-button hover:bg-blue-700 disabled:bg-blue-300" disabled>クイズの回答を分析</button>
-                        <button id="direct-analysis" class="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg apple-button hover:bg-gray-800">または、直接説明する</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('submit-quiz').addEventListener('click', () => submitForAnalysis(answers.join('\n\n')));
-            document.getElementById('direct-analysis').addEventListener('click', showDirectInput);
+                if (currentQuestionIndex < questions.length) {
+                    renderQuestion(currentQuestionIndex);
+                } else {
+                    startAnalysis(userAnswers);
+                }
+            }, { once: true });
         }
 
         function showDirectInput() {
-            quizContainer.innerHTML = `
-                <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-2xl mx-auto">
-                    <h2 class="text-3xl font-bold mb-4">あなたの状況を説明してください</h2>
-                    <p class="text-gray-600 mb-6">あなたの職務経歴、現在の状況、悩み、または目標について説明してください。詳細が多ければ多いほど、より良い分析ができます。</p>
-                    <textarea id="direct-input" class="w-full p-2 border rounded mb-6" rows="8" placeholder="例：私は5年間開発者として働いていますが、方向性を見失っています..."></textarea>
-                    <div class="cf-turnstile" data-sitekey="0x4AAAAAAAcF3d22Nae41Y3g" data-callback="onTurnstileSuccess"></div>
-                    <div class="flex justify-center gap-4 mt-6">
-                        <button id="submit-direct" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg apple-button hover:bg-blue-700 disabled:bg-blue-300" disabled>直接分析を依頼</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('submit-direct').addEventListener('click', () => {
-                const directText = document.getElementById('direct-input').value;
-                if (directText.trim()) {
-                    submitForAnalysis(directText);
-                } else {
-                    alert('あなたの状況を説明してください。');
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('skip-quiz-container').classList.add('hidden');
+            const directInputContainer = document.getElementById('direct-input-container');
+            directInputContainer.classList.remove('hidden');
+        }
+
+        function handleDirectInputSubmit() {
+            const text = document.getElementById('direct-input-text').value.trim();
+            if (text.length < 20) {
+                alert("より詳細な分析のために、あなたの状況をもう少し詳しく記述してください（最低20文字）。");
+                return;
+            }
+            startAnalysis(text);
+        }
+
+        function startAnalysis(data) {
+            document.getElementById('view-container').classList.add('hidden');
+            document.getElementById('skip-quiz-container').classList.add('hidden');
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.classList.remove('hidden');
+
+            const initialResultDiv = document.getElementById('initial-result');
+            initialResultDiv.innerHTML = `
+                <div class="spinner mx-auto mb-4"></div>
+                <h2 class="text-2xl font-bold text-gray-800">AIメンターが思考中...</h2>
+                <p class="text-gray-600 mt-2">あなたの回答を分析し、キャリアパーソナリティレポートを生成しています。約15秒かかることがあります。</p>`;
+            
+            withTurnstileVerification((token) => {
+                fetchAnalysis(data, token, true);
+            });
+        }
+        
+        let fullReport = "";
+
+        function fetchAnalysis(data, token, isInitialAnalysis) {
+            const prompt = isInitialAnalysis ? 
+                (Array.isArray(data) ? `クイズの回答はこちらです： ${data.join(', ')}` : data) :
+                `以前の会話の文脈： "${fullReport}"\n\n私の新しい質問： "${data}"`;
+
+            let accumulatedContent = "";
+            
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, lang: LANG, turnstileToken: token })
+            })
+            .then(response => {
+                if (!response.body) throw new Error('ReadableStream not available.');
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                const targetDiv = isInitialAnalysis ? document.getElementById('initial-result') : null;
+                const chatHistoryDiv = isInitialAnalysis ? null : document.getElementById('chat-history');
+                let aiMessageContainer;
+
+                if (chatHistoryDiv) {
+                    aiMessageContainer = document.createElement('div');
+                    aiMessageContainer.className = 'mb-4';
+                    aiMessageContainer.innerHTML = '<div class="font-bold text-gray-800 mb-1">AIメンター</div><div class="bg-gray-100 p-3 rounded-lg"></div>';
+                    chatHistoryDiv.appendChild(aiMessageContainer);
+                }
+
+                function push() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            if (isInitialAnalysis) {
+                                fullReport = accumulatedContent;
+                                showChatInterface();
+                            } else {
+                                fullReport += `\n\nユーザーの質問: ${data}\nAIの回答: ${accumulatedContent}`;
+                            }
+                            enableChatInput();
+                            return;
+                        }
+                        accumulatedContent += decoder.decode(value, { stream: true });
+                        const htmlContent = converter.makeHtml(accumulatedContent);
+                        
+                        if (targetDiv) {
+                            targetDiv.innerHTML = htmlContent;
+                        } else if (aiMessageContainer) {
+                            aiMessageContainer.querySelector('.bg-gray-100').innerHTML = htmlContent;
+                            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+                        }
+
+                        push();
+                    }).catch(error => {
+                        console.error('Streaming error:', error);
+                        const errorMsg = "<p class='text-red-500'>申し訳ありませんが、AIとの通信中にエラーが発生しました。後でもう一度お試しください。</p>";
+                        if (targetDiv) targetDiv.innerHTML = errorMsg;
+                        if (aiMessageContainer) aiMessageContainer.innerHTML = errorMsg;
+                        enableChatInput();
+                    });
+                }
+                push();
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                const errorMsg = "<p class='text-red-500'>申し訳ありませんが、ネットワークエラーが発生しました。接続を確認してもう一度お試しください。</p>";
+                if (isInitialAnalysis) {
+                    document.getElementById('initial-result').innerHTML = errorMsg;
+                }
+                 enableChatInput();
+            });
+        }
+
+        function showChatInterface() {
+            document.getElementById('chat-history').innerHTML = `
+                <div class="mb-4">
+                    <div class="font-bold text-gray-800 mb-1">AIからの完全なレポート</div>
+                    <div class="bg-gray-100 p-3 rounded-lg">${converter.makeHtml(fullReport)}</div>
+                </div>`;
+            document.getElementById('chat-wrapper').classList.remove('hidden');
+            document.getElementById('chat-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('send-btn').click();
                 }
             });
-            turnstile.render(quizContainer.querySelector('.cf-turnstile'));
+            document.getElementById('send-btn').addEventListener('click', handleSendMessage);
+            enableChatInput();
         }
 
-        window.onTurnstileSuccess = function(token) {
-            turnstileToken = token;
-            document.querySelectorAll('#submit-quiz, #submit-direct').forEach(btn => btn.disabled = false);
-        };
-        
-        async function submitForAnalysis(promptText) {
-            if (!turnstileToken && turnstileRetries < MAX_RETRIES) {
-                console.log('Turnstile token not ready, retrying...');
-                turnstileRetries++;
-                turnstile.reset();
-                setTimeout(() => submitForAnalysis(promptText), 500);
-                return;
-            }
+        function handleSendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
 
-            if (!turnstileToken) {
-                alert('セキュリティ認証に失敗しました。ページを再読み込みして、もう一度お試しください。');
-                return;
-            }
+            disableChatInput();
+            
+            const chatHistory = document.getElementById('chat-history');
+            chatHistory.innerHTML += `
+                <div class="mb-4 text-right">
+                    <div class="font-bold text-blue-600 mb-1">あなた</div>
+                    <div class="bg-blue-100 inline-block p-3 rounded-lg">${message}</div>
+                </div>`;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
 
-            quizContainer.style.display = 'none';
-            chatContainer.style.display = 'flex';
-            appendMessage('bot', '🤖 少々お待ちください。パーソナライズされたキャリア分析を準備しています...');
+            input.value = '';
 
-            try {
-                const response = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: promptText, token: turnstileToken, lang: 'ja' })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "分析中にエラーが発生しました。");
-                }
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let botMessageElement = appendMessage('bot', '');
-                let accumulatedHtml = '';
-
-                while (true) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value, { stream: true });
-                    accumulatedHtml += converter.makeHtml(chunk);
-                    botMessageElement.innerHTML = accumulatedHtml;
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                }
-
-            } catch (error) {
-                console.error('Fetch error:', error);
-                appendMessage('bot', `申し訳ありません、エラーが発生しました： ${error.message}`);
-            }
+            withTurnstileVerification((token) => {
+                fetchAnalysis(message, token, false);
+            });
         }
         
-        function appendMessage(sender, text) {
-            const messageElement = document.createElement('div');
-            messageElement.className = `chat-message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
-            
-            const contentElement = document.createElement('div');
-            contentElement.className = 'message-content';
-            contentElement.innerHTML = text; // Use innerHTML to render markdown
-            
-            messageElement.appendChild(contentElement);
-            chatBox.appendChild(messageElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return contentElement; // Return content element to be updated by stream
+        function disableChatInput() {
+            document.getElementById('chat-input').disabled = true;
+            document.getElementById('send-btn').disabled = true;
+            document.getElementById('send-btn').innerHTML = '<div class="spinner mx-auto" style="width: 24px; height: 24px; border-width: 3px;"></div>';
         }
 
-        async function handleChatSubmit() {
-            const userText = chatInput.value.trim();
-            if (!userText) return;
-
-            appendMessage('user', userText);
-            chatInput.value = '';
-            chatSubmit.disabled = true;
-
-            const fullPrompt = `これまでの会話は次のとおりです:\n${chatBox.innerText}\n\n私の新しい質問は: ${userText}`;
-            
-            try {
-                const response = await fetch('/api/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: fullPrompt, lang: 'ja' })
-                });
-
-                if (!response.ok) throw new Error("ネットワーク応答が正常ではありませんでした。");
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let botMessageElement = appendMessage('bot', '');
-                let accumulatedHtml = '';
-
-                while (true) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value, { stream: true });
-                    accumulatedHtml += converter.makeHtml(chunk);
-                    botMessageElement.innerHTML = accumulatedHtml;
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                }
-            } catch (error) {
-                console.error('Chat error:', error);
-                appendMessage('bot', "申し訳ありません、ご質問を処理できませんでした。");
-            } finally {
-                chatSubmit.disabled = false;
-                chatInput.focus();
-            }
+        function enableChatInput() {
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            document.getElementById('send-btn').innerHTML = '&rarr;';
         }
-        
-        chatSubmit.addEventListener('click', handleChatSubmit);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleChatSubmit();
-        });
 
-        // Initial render
-        renderQuestion();
     </script>
 </body>
 </html> 
