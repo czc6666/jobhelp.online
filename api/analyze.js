@@ -35,7 +35,8 @@ async function handler(req, res) {
     // Vercel automatically parses the JSON body of the request.
     const { turnstileToken, ...apiRequestBody } = req.body;
 
-    // --- Step 2: Verify the Turnstile token ---
+    // --- Step 2: Verify the Turnstile token (Temporarily Disabled) ---
+    /*
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const turnstileFormData = new URLSearchParams();
     turnstileFormData.append('secret', TURNSTILE_SECRET_KEY);
@@ -54,6 +55,7 @@ async function handler(req, res) {
       console.error('Turnstile verification failed:', turnstileData['error-codes']);
       return res.status(403).json({ error: 'Turnstile verification failed.', codes: turnstileData['error-codes'] });
     }
+    */
 
     // --- Step 3: Forward the request to OpenRouter ---
     const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {

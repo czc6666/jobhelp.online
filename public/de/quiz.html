@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test starten | Karriere-Kompass</title>
-    <meta name="description" content="Beantworten Sie 5 Fragen, um sofort einen KI-generierten, tiefgehenden Analysebericht Ihrer beruflichen Persönlichkeit zu erhalten und Ihre Karriere-Entdeckungsreise zu beginnen.">
+    <title>Test Starten | Berufs-Kompass</title>
+    <meta name="description" content="Beantworten Sie 5 sorgfältig gestaltete Fragen, um sofort einen von KI generierten, tiefgehenden Persönlichkeitsanalysebericht zu erhalten und Ihre Karriereerkundung zu beginnen.">
     <meta name="keywords" content="Karrieretest, Persönlichkeitsanalyse, KI-Karriereberater, berufliche Richtung, Karriere-Kompass, Online-Quiz">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://jobhelp.online/de/quiz.html">
@@ -34,7 +34,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script>
+    <!-- Turnstile Script (Temporarily Disabled) -->
+    <!-- <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script> -->
     <style>
         /* Base styling for smooth transitions */
         .quiz-card, #direct-input-container {
@@ -119,15 +120,18 @@
         </div>
     </main>
 
-    <div id="turnstile-container"></div>
+    <!-- Turnstile container, will be managed programmatically -->
+    <!-- <div id="turnstile-container"></div> -->
     <footer class="w-full py-6 text-center bg-white/50 border-t">
-        <p class="text-sm text-gray-500">&copy; 2025 Karriere-Kompass. Alle Rechte vorbehalten.</p>
+        <p class="text-sm text-gray-500">&copy; 2025 Berufs-Kompass. Alle Rechte vorbehalten.</p>
     </footer>
 
     <script>
+        // --- CONFIGURATION ---
         const API_URL = "/api/analyze";
-        const LANG = "de";
 
+        // --- Turnstile State Management (Disabled) ---
+        /*
         let turnstileWidgetId = null;
         let actionQueue = [];
         let isVerificationInProgress = false;
@@ -135,90 +139,37 @@
         window.onTurnstileLoad = function () {
             if (typeof turnstile !== 'undefined') {
                 turnstileWidgetId = turnstile.render('#turnstile-container', {
-                    sitekey: '0x4AAAAAABhyfTjwR6RXipd_',
+                    sitekey: '0x4AAAAAABhyfTjwR6RXipd_', // Replace with your actual site key
                     callback: function(token) {
                         isVerificationInProgress = false;
                         const action = actionQueue.shift();
-                        if (action) { action(token); }
+                        if (action) {
+                            action(token);
+                        }
                     },
-                    'expired-callback': function() {
-                        isVerificationInProgress = false;
-                        if (turnstileWidgetId) { turnstile.reset(turnstileWidgetId); }
-                    },
-                    'error-callback': function() {
-                        isVerificationInProgress = false;
-                        document.getElementById('initial-result').innerHTML = `<div class="text-red-500">Sicherheitsüberprüfung fehlgeschlagen. Bitte aktualisieren und erneut versuchen.</div>`;
-                        actionQueue = [];
-                    },
-                    size: 'invisible',
+                    'expired-callback': () => { isVerificationInProgress = false; if (turnstileWidgetId) turnstile.reset(turnstileWidgetId); },
+                    'error-callback': () => { isVerificationInProgress = false; console.error('Turnstile-Herausforderung konnte nicht gerendert werden.'); },
+                    size: 'invisible'
                 });
             }
         };
 
         function executeProtectedAction(action) {
-            actionQueue.push(action);
-            if (isVerificationInProgress) { return; }
+            if (isVerificationInProgress) {
+                actionQueue.push(action);
+                return;
+            }
             if (turnstileWidgetId !== null) {
                 isVerificationInProgress = true;
+                actionQueue.push(action);
                 turnstile.execute(turnstileWidgetId);
             } else {
-                document.getElementById('initial-result').innerHTML = `<div class="text-red-500">Verifizierungskomponente konnte nicht geladen werden. Bitte laden Sie die Seite neu.</div>`;
+                alert('Verifizierungskomponente konnte nicht geladen werden. Bitte aktualisieren und erneut versuchen.');
             }
         }
+        */
 
-        const questions = [
-            {
-                question: "Stellen Sie sich vor, Sie sind auf einer lockeren Party. Welche Aktivität würde Sie am meisten ansprechen?",
-                options: [
-                    "Ein tiefes, persönliches Gespräch mit einem engen Freund führen.",
-                    "Leute beobachten und die sozialen Dynamiken analysieren.",
-                    "An einem lebhaften Brettspiel oder einer Gruppenaktivität teilnehmen.",
-                    "Dem Gastgeber beim Organisieren von Essen helfen oder sicherstellen, dass alle eine gute Zeit haben."
-                ]
-            },
-            {
-                question: "Wenn Sie ein komplett freies Wochenende hätten, wie würden Sie es idealerweise verbringen?",
-                options: [
-                    "Ein Buch lesen, eine neue Fähigkeit erlernen oder eine Dokumentation ansehen.",
-                    "Etwas Kreatives schaffen: schreiben, zeichnen, Musik machen oder ein DIY-Projekt.",
-                    "Wandern gehen, Sport treiben oder eine andere körperliche Aktivität im Freien.",
-                    "Qualitätszeit mit Familie oder Freunden verbringen."
-                ]
-            },
-            {
-                question: "Wenn Sie bei der Arbeit vor einem komplexen Problem stehen, was ist Ihr erster Ansatz?",
-                options: [
-                    "Daten sammeln und analysieren, um die Ursache zu verstehen.",
-                    "Kreative und unkonventionelle Lösungen brainstormen.",
-                    "Ein Team organisieren und Aufgaben delegieren, um es von mehreren Seiten anzugehen.",
-                    "Die Auswirkungen des Problems auf Teammitglieder und Kunden berücksichtigen."
-                ]
-            },
-            {
-                question: "Was motiviert Sie in einer Karriere am meisten?",
-                options: [
-                    "Die Beherrschung einer Fähigkeit und zum Experten auf Ihrem Gebiet zu werden.",
-                    "Die Möglichkeit, Kreativität auszudrücken und innovativ zu sein.",
-                    "Führung, Einfluss und das Erreichen ehrgeiziger Ziele.",
-                    "Anderen zu helfen und einen positiven Einfluss auf die Gesellschaft zu haben."
-                ]
-            },
-            {
-                question: "Welche Art von Arbeitsumgebung bevorzugen Sie?",
-                options: [
-                    "Eine ruhige, strukturierte Umgebung, in der Sie sich auf Ihre Aufgaben konzentrieren können.",
-                    "Eine dynamische, flexible Umgebung, die zum Experimentieren anregt.",
-                    "Eine wettbewerbsorientierte, ergebnisorientierte Umgebung mit klaren Zielen.",
-                    "Eine kollaborative, unterstützende Umgebung, die auf Teamarbeit ausgerichtet ist."
-                ]
-            }
-        ];
-
-        let currentQuestionIndex = 0;
-        const userAnswers = [];
-        const markdownConverter = new showdown.Converter({ simplifiedAutoLink: true, tables: true, strikethrough: true });
-
-        const viewContainer = document.getElementById('view-container');
+        // --- Core Application Logic ---
         const quizContainer = document.getElementById('quiz-container');
         const skipQuizContainer = document.getElementById('skip-quiz-container');
         const directInputContainer = document.getElementById('direct-input-container');
@@ -229,7 +180,8 @@
         const chatHistory = document.getElementById('chat-history');
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
-        
+        const directInputSubmitBtn = document.getElementById('direct-input-submit-btn');
+
         function renderQuestion() {
             const cardData = questions[currentQuestionIndex];
             const card = document.createElement('div');
@@ -276,10 +228,9 @@
             resultsContainer.style.display = 'block';
             initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center"><div class="spinner"></div><p class="text-gray-600 mt-4">Verifizierung wird angefordert...</p></div>`;
             
-            executeProtectedAction((token) => {
-                initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center"><div class="spinner"></div><p class="text-gray-600 mt-4">Verifizierung erfolgreich. Ihre Erstanalyse wird erstellt...</p></div>`;
-                callInitialAnalysis(prompt, token);
-            });
+            // Bypassing Turnstile
+            const messages = [{ role: 'user', content: prompt }];
+            fetchReport(messages);
         }
 
         function createQuizPrompt(userChoices) {
@@ -468,14 +419,17 @@
                 }, 500);
             });
 
-            document.getElementById('direct-input-submit-btn').addEventListener('click', () => {
+            directInputSubmitBtn.addEventListener('click', () => {
                 const userInput = document.getElementById('direct-input-text').value;
-                if (userInput.trim().length < 20) {
-                    alert('Für eine genauere Analyse geben Sie bitte mindestens 20 Zeichen ein.');
+                if (userInput.trim().length < 10) {
+                    alert('Für eine genauere Analyse geben Sie bitte mindestens 10 Zeichen ein.');
                     return;
                 }
-                const prompt = createDirectInputPrompt(userInput);
-                triggerAnalysis(prompt);
+                const prompt = `Basierend auf der folgenden Selbsteinführung und den Unklarheiten des Benutzers, erstellen Sie einen professionellen Karriereplanungs-Analysebericht. Der Bericht muss enthalten: 1. Kern-Einblicke und Analyse der Persönlichkeitsstärken. 2. 3 Vorschläge für gut passende Karrierewege (einschließlich Berufsbezeichnung, warum es passt und Entwicklungspfad). 3. Einen umsetzbaren Aktionsplan für die nächsten Schritte. Bitte verwenden Sie einen freundlichen, professionellen Mentoren-Ton. Dies ist die Eingabe des Benutzers: "${userInput}"`;
+                
+                // Bypassing Turnstile
+                const messages = [{ role: 'user', content: prompt }];
+                fetchReport(messages);
             });
 
             sendBtn.addEventListener('click', handleSendMessage);
