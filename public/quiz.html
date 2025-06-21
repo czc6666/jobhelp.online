@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开始测试 | 职业指南针</title>
+    <meta name="description" content="回答5个精心设计的问题，立即获取AI生成的深度职业性格分析报告，开启你的职业探索之旅。">
+    <meta name="keywords" content="职业测试, 性格分析, AI职业顾问, 职业方向, 职业指南针, 在线问答">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://jobhelp.online/quiz.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jobhelp.online/quiz.html">
+    <meta property="og:title" content="开始测试 | 职业指南针">
+    <meta property="og:description" content="回答5个精心设计的问题，立即获取AI生成的深度职业性格分析报告，开启你的职业探索之旅。">
+    <meta property="og:image" content="https://jobhelp.online/og-image.png">
+    <meta property="og:site_name" content="职业指南针">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://jobhelp.online/quiz.html">
+    <meta name="twitter:title" content="开始测试 | 职业指南针">
+    <meta name="twitter:description" content="回答5个精心设计的问题，立即获取AI生成的深度职业性格分析报告，开启你的职业探索之旅。">
+    <meta name="twitter:image" content="https://jobhelp.online/og-image.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+    <!-- Turnstile Script -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad" async defer></script>
+    <style>
+        /* Base styling for smooth transitions */
+        .quiz-card, #direct-input-container {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0) scale(1);
+            opacity: 1;
+            will-change: transform, opacity;
+            min-height: 32rem; /* Fix for jittering button */
+        }
+
+        /* Animation states */
+        .card-enter {
+            transform: translateX(100%) scale(0.9);
+            opacity: 0;
+        }
+        .card-exit {
+            transform: translateX(-100%) scale(0.9);
+            opacity: 0;
+        }
+
+        /* For the loading spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "这个测试和分析是免费的吗？",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "是的，完全免费。我们致力于通过AI技术帮助更多对未来迷茫的人。我们使用的部分模型由OpenRouter等平台提供免费额度，让我们能将这份价值传递给您。"
+            }
+        }, {
+            "@type": "Question",
+            "name": "我的答题数据和个人信息安全吗？",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "我们高度重视您的隐私。您的答题记录和与AI的对话内容都是匿名的，仅用于当次的分析和对话，我们不会存储或将其用于其他任何目的。"
+            }
+        }]
+    }
+    </script>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-xl font-bold text-gray-900">职业指南针</a>
+            <a href="index.html" class="text-sm font-semibold text-gray-600 hover:text-blue-600">
+                &larr; 返回主页
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4">
+        <div id="view-container" class="w-full max-w-2xl mx-auto">
+            <!-- Quiz Container -->
+            <div id="quiz-container">
+                <!-- This div will hold the actively transitioning cards -->
+            </div>
+
+            <!-- Direct Input Container (hidden by default) -->
+            <div id="direct-input-container" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">直接与AI导师对话</h2>
+                <p class="text-gray-600 mb-6">请在下方输入你的困惑、想法或一段自我介绍，AI会为你生成专属的职业规划报告。</p>
+                <textarea id="direct-input-text" rows="8" placeholder="例如：我是一名大三学生，学的市场营销，但感觉自己性格内向，不喜欢和人打交道，对未来很迷茫，不知道能做什么..." class="w-full border rounded-lg p-3 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                <button id="direct-input-submit-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-6">
+                    让AI为我分析
+                </button>
+            </div>
+        </div>
+
+        <!-- Skip Quiz Link -->
+        <div id="skip-quiz-container" class="text-center mt-6">
+            <button id="skip-quiz-btn" class="text-sm font-semibold text-gray-500 hover:text-blue-600 transition">
+                不想答题？直接输入你的想法 &rarr;
+            </button>
+        </div>
+
+        <!-- Results/Chat Container -->
+        <div id="results-container" class="w-full max-w-3xl mx-auto hidden">
+            <div id="initial-result" class="text-center bg-white rounded-xl shadow-lg p-6 md:p-10">
+                <!-- Initial summary will be injected here -->
+            </div>
+
+            <div id="chat-wrapper" class="hidden mt-6 bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">与AI导师深入对话</h2>
+                <div id="chat-history" class="h-[50vh] overflow-y-auto pr-4 mb-4 border-b">
+                    <!-- Full report and chat history will appear here -->
+                </div>
+                <div id="chat-input-container" class="flex items-center pt-4">
+                    <input type="text" id="chat-input" placeholder="有其他问题？在这里输入..." class="flex-grow border rounded-l-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="send-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-r-lg hover:bg-blue-700 transition">&rarr;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Content Section -->
+        <section id="additional-content" class="w-full mt-16 mb-16">
+            <div class="container mx-auto px-6">
+                
+                <!-- Usage Examples -->
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">看看他们如何找到方向</h2>
+                    <div class="max-w-5xl mx-auto">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="bg-white p-6 rounded-xl shadow-lg">
+                                <blockquote class="text-gray-600">
+                                    <p>我一直觉得自己性格内向，不适合学的市场营销专业。和AI导师聊了之后，它帮我定位了"数据分析师（市场方向）"这个岗位，既能利用我的专业知识，又不需要过多社交，简直为我量身定做！</p>
+                                </blockquote>
+                                <p class="mt-4 font-semibold text-gray-900">- 大三学生，小李</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-lg">
+                                <blockquote class="text-gray-600">
+                                    <p>工作三年，感觉每天都在重复，失去了热情。通过"职业指南针"，我发现自己的核心驱动力是"创造"和"自主"。现在我正利用业余时间学习开发自己的小产品，感觉生活又有盼头了。</p>
+                                </blockquote>
+                                <p class="mt-4 font-semibold text-gray-900">- 职场新人，王女士</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">常见问题</h2>
+                    <div class="space-y-4">
+                        <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
+                            <summary class="flex justify-between items-center font-semibold text-gray-900">
+                                这个测试和分析是免费的吗？
+                                <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </summary>
+                            <p class="mt-3 text-gray-600">
+                                是的，完全免费。我们致力于通过AI技术帮助更多对未来迷茫的人。我们使用的部分模型由OpenRouter等平台提供免费额度，让我们能将这份价值传递给您。
+                            </p>
+                        </details>
+                        <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
+                            <summary class="flex justify-between items-center font-semibold text-gray-900">
+                                我的答题数据和个人信息安全吗？
+                                <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </summary>
+                            <p class="mt-3 text-gray-600">
+                                我们高度重视您的隐私。您的答题记录和与AI的对话内容都是匿名的，仅用于当次的分析和对话，我们不会存储或将其用于其他任何目的。
+                            </p>
+                        </details>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">有建议或反馈？</h2>
+                     <p class="text-gray-600 mb-6">我们非常希望能听到您的声音，这能帮助我们把产品做得更好。</p>
+                     <a href="mailto:feedback@jobhelp.online" class="bg-gray-900 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-gray-700 transition">
+                        联系我们
+                    </a>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Turnstile container, will be managed programmatically -->
+    <div id="turnstile-container"></div>
+
+    <!-- Footer -->
+    <footer class="w-full py-6 text-center bg-white/50 border-t">
+        <p class="text-sm text-gray-500">&copy; 2025 职业指南针. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // --- CONFIGURATION FOR VERCEL DEPLOYMENT ---
+        // The API_URL now points to our Vercel Serverless Function.
+        const API_URL = "/api/analyze";
+
+        // --- Turnstile State Management ---
+        let turnstileWidgetId = null;
+        let actionQueue = []; // Stores the function to run after getting a token
+        let isVerificationInProgress = false; // State lock for Turnstile
+
+        /**
+         * Called when the Turnstile script is loaded.
+         * Renders an invisible widget to be triggered programmatically.
+         */
+        window.onTurnstileLoad = function () {
+            if (typeof turnstile !== 'undefined') {
+                turnstileWidgetId = turnstile.render('#turnstile-container', {
+                    // Using your real Site Key.
+                    sitekey: '0x4AAAAAABhyfTjwR6RXipd_', 
+                    callback: function(token) {
+                        isVerificationInProgress = false; // Unlock on success
+                        // When a token is received, execute the next action in the queue
+                        const action = actionQueue.shift();
+                        if (action) {
+                            action(token);
+                        }
+                    },
+                    'expired-callback': function() {
+                        isVerificationInProgress = false; // Unlock on expiration
+                        // If token expires, it's best to just reset the widget
+                        if (turnstileWidgetId) {
+                            turnstile.reset(turnstileWidgetId);
+                        }
+                    },
+                    'error-callback': function() {
+                        isVerificationInProgress = false; // Unlock on error
+                        // This is crucial for debugging.
+                        resultsContainer.style.display = 'block';
+                        initialResultContainer.innerHTML = `<div class="text-red-500 text-left">
+                            <h3 class="font-bold text-lg mb-2">人机验证失败</h3>
+                            <p class="text-sm">无法连接到Cloudflare Turnstile服务。请检查：</p>
+                            <ul class="list-disc list-inside mt-2 text-sm">
+                                <li>您的网络连接是否正常？</li>
+                                <li>您是否已将本文件中的 'sitekey' 替换为真实的密钥？</li>
+                                <li>Cloudflare后台的Turnstile站点域名是否配置为 "jobhelp.online"？</li>
+                            </ul>
+                        </div>`;
+                        // Clear the action queue to prevent further executions
+                        actionQueue = [];
+                    },
+                    size: 'invisible', // Use the invisible widget for the best UX
+                });
+            } else {
+                console.error("Turnstile script not loaded.");
+            }
+        }
+
+        /**
+         * Gatekeeper function for all protected actions.
+         * It queues the action and triggers the Turnstile challenge.
+         * @param {function} action The function to execute after successful verification.
+         */
+        function executeProtectedAction(action) {
+            actionQueue.push(action);
+            if (isVerificationInProgress) {
+                // A verification is already running. The action is queued and will run
+                // when the current verification completes. Do nothing more.
+                return;
+            }
+            if (turnstileWidgetId !== null) {
+                isVerificationInProgress = true; // Lock before executing
+                turnstile.execute(turnstileWidgetId);
+            } else {
+                // This case should be rare, but as a fallback, we can alert the user.
+                resultsContainer.style.display = 'block';
+                initialResultContainer.innerHTML = `<div class="text-red-500">人机验证组件加载失败，请刷新页面后重试。</div>`;
+            }
+        }
+
+        const quizData = [
+            {
+                question: "对你来说，最理想的工作与生活状态是？",
+                options: {
+                    a: "工作和生活有清晰的界限，有固定的上下班时间，很少需要加班。",
+                    b: "工作是我实现人生价值的核心，我愿意投入大量时间，以换取未来的巨大回报。",
+                    c: "我喜欢灵活的工作安排，可以让我根据任务需要，不受干扰地深度钻研。",
+                    d: "我希望工作与我的热情融为一体，只要做的事情有意义，我不介意模糊工作与生活的边界。"
+                }
+            },
+            {
+                question: "你如何看待工作中的风险与稳定？",
+                options: {
+                    a: '我极度偏好稳定，一份有保障的薪水和"铁饭碗"让我感到安心，即使收入上限不高。',
+                    b: "我对高风险、高回报的机会感到兴奋，愿意为了创造巨大财富而接受不确定性。",
+                    c: "我最大的安全感来源于我不可替代的专业技能，只要我的技术有市场，我就不担心失业。",
+                    d: "如果一个想法是基于我亲身经历并解决了一个真实痛点，我愿意承担自己创业的风险。"
+                }
+            },
+            {
+                question: "驱动你工作最核心的动力是什么？",
+                options: {
+                    a: "获得受人尊敬的社会地位，拥有安稳的生活，并在一个有章可循的体系里做贡献。",
+                    b: "追求财富、自由以及掌控自己人生的权力。",
+                    c: "在我选择的领域里成为顶尖专家，享受精通一门复杂技艺带来的成就感。",
+                    d: "解决一个曾让我自己或他人深感痛苦的问题，并看到自己的工作带来真实、积极的改变。"
+                }
+            },
+            {
+                question: "你更喜欢在哪种环境下工作？",
+                options: {
+                    a: "在一个有明确规则、层级和流程的大型、成熟组织里。",
+                    b: "在一个充满活力、快节奏的环境中，我可以亲手创建、领导团队并推动业务。",
+                    c: "在一个能让我高度自主、可以心无旁骛地专注于个人专业任务的岗位上。",
+                    d: "为自己工作，或者在一个非常小的团队里，能直接接触到我服务的客户。"
+                }
+            },
+            {
+                question: "当面临一个新挑战时，你倾向于如何解决？",
+                options: {
+                    a: "我会遵循既定的流程和规范，以确保解决方案的公平性和一致性。",
+                    b: "我会寻找市场的空白和创新的机会，哪怕这意味着打破常规。",
+                    c: "我会把复杂的、技术性的难题拆解成小部分，然后逐一攻克。",
+                    d: '我会从一个亲身经历的"痛点"出发，用自己的经验来构建解决方案。'
+                }
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        const userAnswers = [];
+
+        const viewContainer = document.getElementById('view-container');
+        const quizContainer = document.getElementById('quiz-container');
+        const skipQuizContainer = document.getElementById('skip-quiz-container');
+        const directInputContainer = document.getElementById('direct-input-container');
+        const resultsContainer = document.getElementById('results-container');
+        const additionalContent = document.getElementById('additional-content');
+        const initialResultContainer = document.getElementById('initial-result');
+        const chatWrapper = document.getElementById('chat-wrapper');
+        const chatHistory = document.getElementById('chat-history');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const markdownConverter = new showdown.Converter();
+        
+        function renderQuestion() {
+            const cardData = quizData[currentQuestionIndex];
+            
+            const card = document.createElement('div');
+            card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
+            
+            let optionsHTML = '';
+            for (const key in cardData.options) {
+                optionsHTML += `
+                    <div class="option border rounded-lg p-4 mb-3 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition" data-value="${key}">
+                        <span class="font-semibold text-gray-500 mr-3">${key.toUpperCase()})</span>
+                        <span>${cardData.options[key]}</span>
+                    </div>`;
+            }
+
+            card.innerHTML = `
+                <div class="text-right text-sm font-semibold text-gray-400 mb-4">${currentQuestionIndex + 1} / ${quizData.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8">${cardData.question}</h2>
+                <div class="options-container">${optionsHTML}</div>
+            `;
+            
+            quizContainer.innerHTML = ''; // Clear previous card
+            quizContainer.appendChild(card);
+
+            // Trigger enter animation
+            requestAnimationFrame(() => {
+                card.classList.remove('card-enter');
+            });
+
+            // Add event listeners to new options
+            card.querySelectorAll('.option').forEach(optionEl => {
+                optionEl.addEventListener('click', () => handleOptionSelect(optionEl.dataset.value));
+            });
+        }
+
+        function handleOptionSelect(answer) {
+            userAnswers.push({ question: quizData[currentQuestionIndex].question, answer: quizData[currentQuestionIndex].options[answer] });
+            
+            const card = quizContainer.querySelector('.quiz-card');
+            card.classList.add('card-exit');
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    renderQuestion();
+                } else {
+                    // Quiz finished, prepare and trigger analysis
+                    let userChoices = "";
+                    userAnswers.forEach((item, index) => {
+                        userChoices += `问题 ${index + 1}: ${item.question}\n我的选择: ${item.answer}\n\n`;
+                    });
+                    const prompt = createQuizPrompt(userChoices);
+                    triggerAnalysis(prompt);
+                }
+            }, 500); // Wait for exit animation
+        }
+
+        // --- UNIFIED ANALYSIS FLOW ---
+
+        function triggerAnalysis(prompt) {
+            // Hide main containers and show results container with spinner
+            viewContainer.style.display = 'none';
+            skipQuizContainer.style.display = 'none';
+            additionalContent.style.display = 'none'; // Hide additional content when showing results
+            resultsContainer.style.display = 'block';
+            initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center">
+                <div class="spinner"></div>
+                <p class="text-gray-600 mt-4">正在请求人机验证...</p>
+            </div>`;
+            
+            // Call the gatekeeper function which will handle Turnstile
+            executeProtectedAction((token) => {
+                initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center">
+                    <div class="spinner"></div>
+                    <p class="text-gray-600 mt-4">验证成功，正在为您生成初步分析...</p>
+                </div>`;
+                callInitialAnalysis(prompt, token);
+            });
+        }
+
+        function createQuizPrompt(userChoices) {
+            return `你是一个顶级的职业规划AI，名叫"职业指南针"。用户完成了问卷，这是他的选择：
+            ---
+            ${userChoices}
+            ---
+            请严格按照以下JSON格式返回你的分析。
+            重要规则: 你的回复必须是单一的、可以被JSON.parse()直接解析的JSON对象。在JSON的字符串值中，所有双引号（"）都必须用反斜杠（\\）进行转义（例如，"他说\\"你好世界\\"）。
+            {
+              "archetype_title": "一个精准、吸引人的原型标题，例如：风险掌控者",
+              "archetype_summary": "用一句话生动地概括这个原型的核心特质。",
+              "job_suggestions": ["根据分析，提供3个最匹配的职业方向（字符串数组）"],
+              "full_report": "这里是完整的、详细的分析报告，请使用Markdown格式。报告应包含：1. 对原型更深入的解读。 2. 详细的价值观与动机剖析。 3. 对推荐的3个职业方向进行详细阐述。 4. 结尾的鼓励和追问引导。"
+            }`;
+        }
+
+        function createDirectInputPrompt(userInput) {
+            return `你是一个顶级的职业规划AI，名叫"职业指南针"。用户输入了直接对话，这是他的输入：
+            ---
+            ${userInput}
+            ---
+            请严格按照以下JSON格式返回你的分析。
+            重要规则: 你的回复必须是单一的、可以被JSON.parse()直接解析的JSON对象。在JSON的字符串值中，所有双引号（"）都必须用反斜杠（\\）进行转义（例如，"他说\\"你好世界\\"）。
+            {
+              "archetype_title": "一个精准、吸引人的原型标题",
+              "archetype_summary": "用一句话生动地概括这个用户的核心特质。",
+              "job_suggestions": ["根据分析，提供3个最匹配的职业方向（字符串数组）"],
+              "full_report": "这里是完整的、详细的分析报告，请使用Markdown格式。报告应包含：1. 对用户自我描述的深入解读。 2. 挖掘出的潜在价值观与动机。 3. 对推荐的3个职业方向进行详细阐述。 4. 结尾的鼓励和追问引导。"
+            }`;
+        }
+
+        let fullReport = '';
+        let conversationHistory = [];
+
+        async function callInitialAnalysis(prompt, turnstileToken) {
+             try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "qwen/qwen3-8b:free",
+                        messages: [{ role: "user", content: prompt }],
+                        stream: false,
+                        turnstileToken: turnstileToken
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`API call failed: ${response.status}. ${errorBody}`);
+                }
+
+                const result = await response.json();
+                const analysis = JSON.parse(result.choices[0].message.content);
+
+                // Store the full report for later, and clean it from escaped quotes.
+                fullReport = analysis.full_report.replace(/\\"/g, '"');
+
+                // Build job suggestions HTML, cleaning each suggestion.
+                let suggestionsHTML = '';
+                if (analysis.job_suggestions && analysis.job_suggestions.length > 0) {
+                    suggestionsHTML = `
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <p class="text-sm font-semibold text-gray-500 mb-4">为你推荐的职业方向：</p>
+                            <div class="flex flex-wrap justify-center gap-3">
+                                ${analysis.job_suggestions.map(job => `<span class="bg-gray-100 text-gray-800 text-sm font-medium px-4 py-2 rounded-full">${job.replace(/\\"/g, '"')}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Display the initial summary, cleaning the text fields.
+                initialResultContainer.innerHTML = `
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-blue-600 mb-3">${analysis.archetype_title.replace(/\\"/g, '"')}</h2>
+                    <p class="text-lg text-gray-700 max-w-2xl mx-auto">${analysis.archetype_summary.replace(/\\"/g, '"')}</p>
+                    ${suggestionsHTML}
+                    <button id="show-full-report-btn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-10">
+                        查看完整分析 & 开启对话
+                    </button>
+                `;
+
+                document.getElementById('show-full-report-btn').addEventListener('click', showFullReportAndChat);
+
+            } catch (error) {
+                initialResultContainer.innerHTML = `<div class="text-red-500">抱歉，分析出错了: ${error.message}</div>`;
+            }
+        }
+        
+        function showFullReportAndChat() {
+            // Hide the initial result summary button
+            document.getElementById('initial-result').style.display = 'none';
+            
+            // Show the chat interface
+            chatWrapper.style.display = 'block';
+
+            // Render the full report
+            const reportHtml = markdownConverter.makeHtml(fullReport);
+            chatHistory.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
+
+            // Prepare conversation history for follow-up questions
+            conversationHistory = [
+                { role: "user", content: "这是我的问卷结果，请开始分析：" + JSON.stringify(userAnswers) },
+                { role: "assistant", content: fullReport }
+            ];
+        }
+
+        async function callLLM(messages, turnstileToken) {
+            // This function is now only for follow-up chats
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "qwen/qwen3-8b:free",
+                        messages: messages,
+                        stream: true,
+                        turnstileToken: turnstileToken
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`API call failed: ${response.status}. ${errorBody}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let botMessageContent = '';
+                
+                const botMessageContainer = document.createElement('div');
+                botMessageContainer.className = "flex justify-start mb-3";
+                botMessageContainer.innerHTML = `<div class="bg-gray-100 rounded-lg py-2 px-4 max-w-lg prose"></div>`;
+                chatHistory.appendChild(botMessageContainer);
+                const contentElement = botMessageContainer.querySelector('div');
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); 
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const content = line.substring(6);
+                            if (content === '[DONE]') continue;
+                            try {
+                                const chunk = JSON.parse(content);
+                                if (chunk.choices[0].delta.content) {
+                                    botMessageContent += chunk.choices[0].delta.content;
+                                    contentElement.innerHTML = markdownConverter.makeHtml(botMessageContent);
+                                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                                }
+                            } catch (e) { console.error('Error parsing stream chunk:', e); }
+                        }
+                    }
+                }
+                
+                conversationHistory.push({ role: "assistant", content: botMessageContent });
+
+            } catch (error) {
+                const errorElement = document.createElement('div');
+                errorElement.className = 'text-red-500';
+                errorElement.textContent = `抱歉，出错了: ${error.message}`;
+                chatHistory.appendChild(errorElement);
+            } finally {
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.focus();
+                // Reset the widget to allow getting a new token for the next message
+                if (turnstileWidgetId) {
+                    turnstile.reset(turnstileWidgetId);
+                }
+            }
+        }
+        
+        async function handleSendMessage() {
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
+
+            // Add user message to UI
+            const userMessageHTML = `<div class="flex justify-end mb-3">
+                <div class="bg-blue-500 text-white rounded-lg py-2 px-4 max-w-lg">
+                    ${messageText}
+                </div>
+            </div>`;
+            chatHistory.innerHTML += userMessageHTML;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            chatInput.value = '';
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
+
+            const systemInstruction = `规则：你是一个名为"职业指南针"的AI生涯导师。你的回答必须保持简洁（尽量不超过三句话，多用列表），并始终围绕职业规划、技能提升、求职建议等相关话题。如果用户提出无关问题（如"今天天气怎么样"、"讲个笑话"），你必须礼貌地拒绝，并将其引导回职业话题。`;
+
+            // Add history and user message together for the API call
+            const messagesForAPI = [
+                ...conversationHistory,
+                { role: 'system', content: systemInstruction },
+                { role: 'user', content: messageText }
+            ];
+            
+            // Call the gatekeeper function
+            executeProtectedAction((token) => {
+                // The user message is already in the history for the UI,
+                // but the conversationHistory for the API needs the new message.
+                conversationHistory.push({ role: 'user', content: messageText });
+                callLLM(messagesForAPI, token);
+            });
+        }
+
+        sendBtn.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && handleSendMessage());
+
+        // --- EVENT LISTENERS ---
+
+        document.getElementById('skip-quiz-btn').addEventListener('click', () => {
+            const card = quizContainer.querySelector('.quiz-card');
+            // Animate the current card out
+            if (card) {
+                card.classList.add('card-exit');
+            }
+
+            // After the exit animation, switch the views
+            setTimeout(() => {
+                quizContainer.style.display = 'none';
+                directInputContainer.classList.remove('hidden');
+                
+                // Animate the new container in, just like a new question card
+                directInputContainer.classList.add('card-enter');
+                requestAnimationFrame(() => {
+                    directInputContainer.classList.remove('card-enter');
+                });
+            }, 500); // This duration should match the CSS transition duration
+        });
+
+        document.getElementById('direct-input-submit-btn').addEventListener('click', () => {
+            const userInput = document.getElementById('direct-input-text').value;
+            if (userInput.trim().length < 20) {
+                alert('为了更准确的分析，请输入至少20个字。');
+                return;
+            }
+            const prompt = createDirectInputPrompt(userInput);
+            triggerAnalysis(prompt);
+        });
+        
+        // Initial render
+        document.addEventListener('DOMContentLoaded', renderQuestion);
+    </script>
+</body>
+</html> 
