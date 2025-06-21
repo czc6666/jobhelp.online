@@ -146,6 +146,7 @@
     <!-- <div id="turnstile-container"></div> -->
 
     <script>
+        /* global showdown */
         // --- CONFIGURATION ---
         const API_URL = "/api/analyze";
 
@@ -248,9 +249,9 @@
                 question: "新しい課題に直面したとき、どのように解決する傾向がありますか？",
                 options: {
                     a: "公平性と一貫性を確保するために、確立された手順と基準に従う。",
-                    b: "型にはまらないとしても、市場のギャップや革新的な機会を探す。",
+                    b: "たとえそれが型破りであっても、市場のギャップや革新的な機会を探す。",
                     c: "複雑な技術的問題を小さな部分に分解し、一つずつ取り組む。",
-                    d: "個人的な「ペインポイント」から始め、自分の経験を活かして解決策を構築する。"
+                    d: "個人的な「ペインポイント」から出発し、自身の経験を基に解決策を構築する。"
                 }
             }
         ];
@@ -319,7 +320,6 @@
         function triggerAnalysis(prompt) {
             document.getElementById('view-container').style.display = 'none';
             skipQuizContainer.style.display = 'none';
-            additionalContent.style.display = 'none';
             resultsContainer.style.display = 'block';
             initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center">
                 <div class="spinner"></div>
@@ -330,32 +330,32 @@
         }
 
         function createQuizPrompt(userChoices) {
-            return `あなたは「キャリアコンパス」という名前の一流AIキャリアアドバイザーです。ユーザーがアンケートに回答しました。以下がその選択肢です。
+            return `あなたは「キャリアコンパス」という名のトップクラスのAIキャリアアドバイザーです。ユーザーがアンケートに回答しました。以下がその選択肢です：
             ---
             ${userChoices}
             ---
             分析結果を厳密に以下のJSON形式で返してください。
-            重要ルール：応答全体は、JSON.parse()で直接解析できる単一の生のJSONオブジェクトでなければなりません。JSON文字列の値の中では、すべての二重引用符（"）をバックスラッシュ（\\）でエスケープする必要があります。例：「彼は\\"こんにちは\\"と言った」。
+            重要ルール：あなたの応答全体は、JSON.parse()で直接解析できる単一の生のJSONオブジェクトでなければなりません。JSON文字列の値の中では、すべての二重引用符（"）をバックスラッシュ（\\）でエスケープする必要があります。例：「彼は\\"こんにちは、世界\\"と言った」。
             {
-              "archetype_title": "正確で魅力的なアーキタイプタイトル、例：リスクコントローラー",
+              "archetype_title": "正確で魅力的なアーキタイプ名、例：リスクコントローラー",
               "archetype_summary": "このアーキタイプの核心的な特徴を鮮やかに捉えた一文の要約。",
-              "job_suggestions": ["分析に基づいた最適な3つのキャリアパスを提供してください（文字列の配列）"],
-              "full_report": "これは完全で詳細な分析レポートです。Markdown形式を使用してください。レポートには以下を含める必要があります：1. アーキタイプのより深い解釈。2. 彼らの価値観と動機の詳細な分析。3. 推奨される3つのキャリアパスの詳細な説明。4. 励ましの言葉とフォローアップの質問を促す言葉。"
+              "job_suggestions": ["分析に基づいて最も一致する3つのキャリアパスを提供してください（文字列の配列）"],
+              "full_report": "これは完全で詳細な分析レポートです。Markdown形式を使用してください。レポートには以下を含める必要があります：1. アーキタイプのより深い解釈。2. 彼らの価値観と動機の詳細な分析。3. 推奨される3つのキャリアパスの詳細な説明。4. 励ましの言葉と、フォローアップの質問を促す締めくくり。"
             }`;
         }
 
         function createDirectInputPrompt(userInput) {
-            return `あなたは「キャリアコンパス」という名前の一流AIキャリアアドバイザーです。ユーザーが直接対話を開始しました。以下がその入力です。
+            return `あなたは「キャリアコンパス」という名のトップクラスのAIキャリアアドバイザーです。ユーザーが直接対話を開始しました。以下がその入力です：
             ---
             ${userInput}
             ---
             分析結果を厳密に以下のJSON形式で返してください。
-            重要ルール：応答全体は、JSON.parse()で直接解析できる単一の生のJSONオブジェクトでなければなりません。JSON文字列の値の中では、すべての二重引用符（"）をバックスラッシュ（\\）でエスケープする必要があります。例：「彼は\\"こんにちは\\"と言った」。
+            重要ルール：あなたの応答全体は、JSON.parse()で直接解析できる単一の生のJSONオブジェクトでなければなりません。JSON文字列の値の中では、すべての二重引用符（"）をバックスラッシュ（\\）でエスケープする必要があります。例：「彼は\\"こんにちは、世界\\"と言った」。
             {
-              "archetype_title": "正確で魅力的なアーキタイプタイトル",
+              "archetype_title": "正確で魅力的なアーキタイプ名",
               "archetype_summary": "ユーザーの核心的な特徴を鮮やかに捉えた一文の要約。",
-              "job_suggestions": ["分析に基づいた最適な3つのキャリアパスを提供してください（文字列の配列）"],
-              "full_report": "これは完全で詳細な分析レポートです。Markdown形式を使用してください。レポートには以下を含める必要があります：1. ユーザーの自己記述の深い解釈。2. 潜在的な価値観と動機の発見。3. 推奨される3つのキャリアパスの詳細な説明。4. 励ましの言葉とフォローアップの質問を促す言葉。"
+              "job_suggestions": ["分析に基づいて最も一致する3つのキャリアパスを提供してください（文字列の配列）"],
+              "full_report": "これは完全で詳細な分析レポートです。Markdown形式を使用してください。レポートには以下を含める必要があります：1. ユーザーの自己記述の深い解釈。2. 潜在的な価値観と動機の発見。3. 推奨される3つのキャリアパスの詳細な説明。4. 励ましの言葉と、フォローアップの質問を促す締めくくり。"
             }`;
         }
 
@@ -387,7 +387,7 @@
                 if (analysis.job_suggestions && analysis.job_suggestions.length > 0) {
                     suggestionsHTML = `
                         <div class="mt-8 pt-6 border-t border-gray-200">
-                            <p class="text-sm font-semibold text-gray-500 mb-4">あなたへのおすすめのキャリアパス：</p>
+                            <p class="text-sm font-semibold text-gray-500 mb-4">あなたへのおすすめキャリアパス:</p>
                             <div class="flex flex-wrap justify-center gap-3">
                                 ${analysis.job_suggestions.map(job => `<span class="bg-gray-100 text-gray-800 text-sm font-medium px-4 py-2 rounded-full">${job.replace(/\\"/g, '"')}</span>`).join('')}
                             </div>
@@ -414,6 +414,7 @@
         function showFullReportAndChat() {
             document.getElementById('initial-result').style.display = 'none';
             chatWrapper.style.display = 'block';
+            document.getElementById('additional-content').style.display = 'none';
 
             const reportHtml = markdownConverter.makeHtml(fullReport);
             chatHistoryContainer.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
@@ -468,7 +469,7 @@
                                     contentElement.innerHTML = markdownConverter.makeHtml(botMessageContent);
                                     chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
                                 }
-                            } catch (e) { console.error('ストリームチャンクの解析中にエラーが発生しました:', e); }
+                            } catch (e) { console.error('ストリームチャンクの解析エラー:', e); }
                         }
                     }
                 }
@@ -478,7 +479,7 @@
             } catch (error) {
                 const errorElement = document.createElement('div');
                 errorElement.className = 'text-red-500';
-                errorElement.textContent = `申し訳ありませんが、エラーが発生しました: ${error.message}`;
+                errorElement.textContent = `申し訳ありません、エラーが発生しました: ${error.message}`;
                 chatHistoryContainer.appendChild(errorElement);
             } finally {
                 chatInput.disabled = false;
@@ -499,7 +500,7 @@
             chatInput.disabled = true;
             sendBtn.disabled = true;
 
-            const systemInstruction = `ルール：あなたは「キャリアコンパス」という名前のAIキャリアメンターです。回答は簡潔に（3文以内に収め、リストを多用するようにしてください）、常にキャリアプランニング、スキルアップ、就職活動のアドバイスなどを中心に展開してください。ユーザーが関係のない質問（例：「天気はどう？」、「冗談を言って」）をした場合は、丁寧に断り、キャリアの話題に戻すようにしてください。`;
+            const systemInstruction = `ルール：あなたは「キャリアコンパス」という名のAIキャリアメンターです。あなたの回答は簡潔にし（3文以内に収めるようにし、頻繁にリストを使用してください）、常にキャリアプランニング、スキルアップ、就職活動のアドバイスなどを中心に展開する必要があります。ユーザーが関係のない質問をした場合（例：「天気はどうですか？」、「冗談を言って」）、丁寧に断り、キャリア関連の話題に誘導する必要があります。`;
             const messagesForAPI = [...conversationHistory, { role: 'system', content: systemInstruction }, { role: 'user', content: messageText }];
             
             conversationHistory.push({ role: 'user', content: messageText });

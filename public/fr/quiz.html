@@ -104,20 +104,20 @@
         <section id="additional-content" class="w-full mt-16 mb-16">
             <div class="container mx-auto px-6">
                 <div class="mb-16">
-                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">Voyez comment ils ont trouvé leur voie</h2>
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">Découvrez comment ils ont trouvé leur voie</h2>
                     <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
                         <div class="bg-white p-6 rounded-xl shadow-lg">
-                            <blockquote class="text-gray-600"><p>"J'ai toujours pensé que ma personnalité introvertie ne correspondait pas à ma majeure en marketing. Après avoir parlé avec le mentor IA, il m'a aidé à identifier le rôle d'Analyste de Données (Marketing), qui utilise mes connaissances professionnelles sans nécessiter trop d'interaction sociale. C'est parfait pour moi !"</p></blockquote>
-                            <p class="mt-4 font-semibold text-gray-900">- Léo, étudiant</p>
+                            <blockquote class="text-gray-600"><p>"J'ai toujours pensé que ma personnalité introvertie ne convenait pas à mes études en marketing. Après avoir discuté avec le mentor IA, il m'a aidé à identifier le poste d' 'Analyste de données (orientation marketing)'. Cela me permet d'utiliser mes connaissances professionnelles sans exiger trop de socialisation. C'est parfait pour moi !"</p></blockquote>
+                            <p class="mt-4 font-semibold text-gray-900">- Léo (Étudiant)</p>
                         </div>
                         <div class="bg-white p-6 rounded-xl shadow-lg">
-                            <blockquote class="text-gray-600"><p>"Après trois ans de travail, j'avais l'impression de me répéter chaque jour et j'avais perdu ma passion. Grâce à 'Boussole de Carrière', j'ai découvert que mes moteurs principaux sont la 'créativité' et l''autonomie'. J'apprends maintenant à développer mon propre petit produit pendant mon temps libre, et la vie semble à nouveau pleine d'espoir."</p></blockquote>
-                            <p class="mt-4 font-semibold text-gray-900">- Mme Dubois, jeune professionnelle</p>
+                            <blockquote class="text-gray-600"><p>"Après trois ans de travail, j'avais l'impression que chaque jour était une répétition et j'avais perdu ma passion. Grâce à la 'Boussole de Carrière', j'ai découvert que mes principaux moteurs sont la 'créativité' et l' 'autonomie'. J'utilise maintenant mon temps libre pour développer mon propre petit produit, et je me sens de nouveau plein d'espoir."</p></blockquote>
+                            <p class="mt-4 font-semibold text-gray-900">- Mme. Dubois (Jeune professionnelle)</p>
                         </div>
                     </div>
                 </div>
                 <div class="max-w-3xl mx-auto mb-16">
-                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">Foire Aux Questions</h2>
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">Questions fréquentes</h2>
                     <div class="space-y-4">
                         <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
                             <summary class="flex justify-between items-center font-semibold text-gray-900">Ce test et cette analyse sont-ils gratuits ?<svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
@@ -130,9 +130,9 @@
                     </div>
                 </div>
                 <div class="text-center">
-                     <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Avez-vous des suggestions ou des commentaires ?</h2>
-                     <p class="text-gray-600 mb-6">Nous serions ravis de connaître votre avis pour nous aider à améliorer le produit.</p>
-                     <a href="mailto:czc@jobhelp.online" class="bg-gray-900 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-gray-700 transition">Nous Contacter</a>
+                     <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Des suggestions ou des commentaires ?</h2>
+                     <p class="text-gray-600 mb-6">Nous aimerions beaucoup entendre votre avis, cela nous aide à améliorer le produit.</p>
+                     <a href="mailto:czc@jobhelp.online" class="bg-gray-900 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-gray-700 transition">Nous contacter</a>
                 </div>
             </div>
         </section>
@@ -144,6 +144,7 @@
     </footer>
 
     <script>
+        /* global showdown */
         // --- CONFIGURATION ---
         const API_URL = "/api/analyze";
 
@@ -191,7 +192,6 @@
         const skipQuizContainer = document.getElementById('skip-quiz-container');
         const directInputContainer = document.getElementById('direct-input-container');
         const resultsContainer = document.getElementById('results-container');
-        const additionalContent = document.getElementById('additional-content');
 
         const initialResultContainer = document.getElementById('initial-result');
         const chatWrapper = document.getElementById('chat-wrapper');
@@ -317,7 +317,6 @@
         function triggerAnalysis(prompt) {
             document.getElementById('view-container').style.display = 'none';
             skipQuizContainer.style.display = 'none';
-            additionalContent.style.display = 'none';
             resultsContainer.style.display = 'block';
             initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center">
                 <div class="spinner"></div>
@@ -412,6 +411,7 @@
         function showFullReportAndChat() {
             document.getElementById('initial-result').style.display = 'none';
             chatWrapper.style.display = 'block';
+            document.getElementById('additional-content').style.display = 'none';
 
             const reportHtml = markdownConverter.makeHtml(fullReport);
             chatHistoryContainer.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
@@ -466,7 +466,7 @@
                                     contentElement.innerHTML = markdownConverter.makeHtml(botMessageContent);
                                     chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
                                 }
-                            } catch (e) { console.error('Erreur lors de l'analyse du fragment de flux :', e); }
+                            } catch (e) { console.error('Erreur lors de l\'analyse du fragment de flux :', e); }
                         }
                     }
                 }

@@ -493,6 +493,7 @@
         function showFullReportAndChat() {
             document.getElementById('initial-result').style.display = 'none';
             chatWrapper.style.display = 'block';
+            document.getElementById('additional-content').style.display = 'none';
 
             const reportHtml = markdownConverter.makeHtml(fullReport);
             chatHistoryContainer.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;

@@ -118,6 +118,41 @@
                 </div>
             </div>
         </div>
+        <section id="additional-content" class="w-full mt-16 mb-16">
+            <div class="container mx-auto px-6">
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">Sehen Sie, wie andere ihren Weg fanden</h2>
+                    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <blockquote class="text-gray-600"><p>"Ich dachte immer, meine introvertierte Persönlichkeit passt nicht zu meinem Marketing-Studium. Nach einem Gespräch mit dem KI-Mentor half er mir, die Rolle 'Datenanalyst (Marketing)' zu finden. Hier kann ich mein Fachwissen nutzen, ohne viel Smalltalk. Perfekt für mich!"</p></blockquote>
+                            <p class="mt-4 font-semibold text-gray-900">- Max (Student)</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <blockquote class="text-gray-600"><p>"Nach drei Jahren im Job fühlte sich alles repetitiv an und ich verlor meine Leidenschaft. Durch den 'Karriere-Kompass' entdeckte ich, dass meine wahren Antreiber 'Kreativität' und 'Autonomie' sind. Jetzt entwickle ich in meiner Freizeit ein eigenes kleines Produkt und habe wieder Hoffnung für meine Zukunft."</p></blockquote>
+                            <p class="mt-4 font-semibold text-gray-900">- Frau Schmidt (Berufseinsteigerin)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-10">Häufig gestellte Fragen</h2>
+                    <div class="space-y-4">
+                        <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
+                            <summary class="flex justify-between items-center font-semibold text-gray-900">Ist dieser Test und die Analyse kostenlos?<svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+                            <p class="mt-3 text-gray-600">Ja, es ist komplett kostenlos. Wir haben uns verpflichtet, durch KI-Technologie mehr Menschen zu helfen, die über ihre Zukunft unsicher sind. Einige der von uns verwendeten Modelle werden von Plattformen wie OpenRouter mit kostenlosen Kontingenten zur Verfügung gestellt, was es uns ermöglicht, diesen Wert an Sie weiterzugeben.</p>
+                        </details>
+                        <details class="group bg-white p-4 rounded-xl shadow-lg cursor-pointer">
+                            <summary class="flex justify-between items-center font-semibold text-gray-900">Sind meine Daten und persönlichen Informationen sicher?<svg class="w-5 h-5 transform transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+                            <p class="mt-3 text-gray-600">Wir nehmen Ihre Privatsphäre sehr ernst. Ihre Antworten und Gespräche mit der KI sind anonym und werden nur für die laufende Analyse und den Dialog verwendet. Wir speichern oder verwenden sie nicht für andere Zwecke.</p>
+                        </details>
+                    </div>
+                </div>
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Haben Sie Vorschläge oder Feedback?</h2>
+                     <p class="text-gray-600 mb-6">Wir würden uns freuen, von Ihnen zu hören. Das hilft uns, das Produkt zu verbessern.</p>
+                     <a href="mailto:czc@jobhelp.online" class="bg-gray-900 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-gray-700 transition">Kontakt</a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Turnstile container, will be managed programmatically -->
@@ -127,6 +162,7 @@
     </footer>
 
     <script>
+        /* global showdown */
         // --- CONFIGURATION ---
         const API_URL = "/api/analyze";
 
@@ -174,7 +210,6 @@
         const skipQuizContainer = document.getElementById('skip-quiz-container');
         const directInputContainer = document.getElementById('direct-input-container');
         const resultsContainer = document.getElementById('results-container');
-        const additionalContent = document.getElementById('additional-content');
 
         const initialResultContainer = document.getElementById('initial-result');
         const chatWrapper = document.getElementById('chat-wrapper');
@@ -300,7 +335,6 @@
         function triggerAnalysis(prompt) {
             document.getElementById('view-container').style.display = 'none';
             skipQuizContainer.style.display = 'none';
-            additionalContent.style.display = 'none';
             resultsContainer.style.display = 'block';
             initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center">
                 <div class="spinner"></div>
@@ -395,6 +429,7 @@
         function showFullReportAndChat() {
             document.getElementById('initial-result').style.display = 'none';
             chatWrapper.style.display = 'block';
+            document.getElementById('additional-content').style.display = 'none';
 
             const reportHtml = markdownConverter.makeHtml(fullReport);
             chatHistoryContainer.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
