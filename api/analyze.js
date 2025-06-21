@@ -62,7 +62,7 @@ async function handler(req, res) {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://jobhelp.online', // As required by OpenRouter
-        'X-Title': '职业指南针',
+        'X-Title': encodeURIComponent('职业指南针'),
       },
       body: JSON.stringify(apiRequestBody),
     });
