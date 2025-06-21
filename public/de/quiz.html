@@ -169,29 +169,90 @@
         }
         */
 
-        // --- Core Application Logic ---
+        // --- Core Application Logic (Restored) ---
         const quizContainer = document.getElementById('quiz-container');
         const skipQuizContainer = document.getElementById('skip-quiz-container');
         const directInputContainer = document.getElementById('direct-input-container');
         const resultsContainer = document.getElementById('results-container');
         const additionalContent = document.getElementById('additional-content');
+
         const initialResultContainer = document.getElementById('initial-result');
         const chatWrapper = document.getElementById('chat-wrapper');
-        const chatHistory = document.getElementById('chat-history');
+        const chatHistoryContainer = document.getElementById('chat-history');
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
+        const directInputText = document.getElementById('direct-input-text');
         const directInputSubmitBtn = document.getElementById('direct-input-submit-btn');
+
+        const markdownConverter = new showdown.Converter();
+        let conversationHistory = [];
+        let fullReport = '';
+
+        const questions = [
+            {
+                question: "Wie sieht Ihre ideale Work-Life-Balance aus?",
+                options: {
+                    a: "Klare Grenzen zwischen Arbeit und Leben, mit festen Arbeitszeiten und seltenen Überstunden.",
+                    b: "Die Arbeit ist zentral für meinen Lebenszweck; ich bin bereit, viel Zeit für zukünftige Belohnungen zu investieren.",
+                    c: "Ich bevorzuge einen flexiblen Zeitplan, der mir tiefes, ungestörtes Arbeiten je nach Aufgabe ermöglicht.",
+                    d: "Ich möchte, dass meine Arbeit mit meiner Leidenschaft verschmilzt; es macht mir nichts aus, die Grenzen für sinnvolle Aufgaben zu verwischen."
+                }
+            },
+            {
+                question: "Wie stehen Sie zu Risiko versus Stabilität in Ihrer Karriere?",
+                options: {
+                    a: "Ich bevorzuge Stabilität sehr; ein garantiertes Gehalt und ein sicherer Arbeitsplatz geben mir Sicherheit, auch bei einer niedrigeren Einkommensobergrenze.",
+                    b: "Ich bin begeistert von Gelegenheiten mit hohem Risiko und hoher Belohnung und bereit, Unsicherheit für großen Reichtum in Kauf zu nehmen.",
+                    c: "Meine größte Sicherheit kommt von meinen unersetzlichen Fähigkeiten; ich mache mir keine Sorgen um Arbeitslosigkeit, solange meine Fähigkeiten gefragt sind.",
+                    d: "Ich bin bereit, das Risiko einer eigenen Unternehmensgründung einzugehen, wenn die Idee auf einem realen Problem basiert, das ich erlebt habe."
+                }
+            },
+            {
+                question: "Was ist Ihre Kernmotivation für die Arbeit?",
+                options: {
+                    a: "Respekt zu erlangen, ein stabiles Leben zu führen und in einem strukturierten System einen Beitrag zu leisten.",
+                    b: "Reichtum, Freiheit und die Macht, mein eigenes Leben zu kontrollieren, zu verfolgen.",
+                    c: "Ein Top-Experte in meinem gewählten Bereich zu werden und das Gefühl der Vollendung durch die Beherrschung eines komplexen Handwerks zu genießen.",
+                    d: "Ein Problem zu lösen, das mir oder anderen echten Schmerz bereitet hat, und zu sehen, wie meine Arbeit positive Veränderungen bewirkt."
+                }
+            },
+            {
+                question: "In welcher Art von Umgebung arbeiten Sie am liebsten?",
+                options: {
+                    a: "In einer großen, etablierten Organisation mit klaren Regeln, Hierarchien und Prozessen.",
+                    b: "In einer dynamischen, schnelllebigen Umgebung, in der ich ein Team aufbauen, leiten und das Geschäft vorantreiben kann.",
+                    c: "In einer Rolle mit hoher Autonomie, die es mir ermöglicht, mich ohne Ablenkung auf meine beruflichen Aufgaben zu konzentrieren.",
+                    d: "Für mich selbst oder in einem sehr kleinen Team mit direktem Kontakt zu den Kunden, die ich bediene, zu arbeiten."
+                }
+            },
+            {
+                question: "Wie lösen Sie eine neue Herausforderung normalerweise?",
+                options: {
+                    a: "Ich befolge etablierte Verfahren und Standards, um Fairness und Konsistenz zu gewährleisten.",
+                    b: "Ich suche nach Marktlücken und innovativen Möglichkeiten, auch wenn das bedeutet, neue Wege zu gehen.",
+                    c: "Ich zerlege komplexe, technische Probleme in kleinere Teile und gehe sie nacheinander an.",
+                    d: "Ich gehe von einem persönlichen 'Schmerzpunkt' aus und nutze meine eigene Erfahrung, um eine Lösung zu entwickeln."
+                }
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        const userAnswers = [];
 
         function renderQuestion() {
             const cardData = questions[currentQuestionIndex];
+            
             const card = document.createElement('div');
             card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
             
-            const optionsHTML = cardData.options.map(option => `
-                <div class="option border rounded-lg p-4 mb-3 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition">
-                    <span>${option}</span>
-                </div>`
-            ).join('');
+            let optionsHTML = '';
+            for (const key in cardData.options) {
+                optionsHTML += `
+                    <div class="option border rounded-lg p-4 mb-3 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition" data-value="${key}">
+                        <span class="font-semibold text-gray-500 mr-3">${key.toUpperCase()})</span>
+                        <span>${cardData.options[key]}</span>
+                    </div>`;
+            }
 
             card.innerHTML = `
                 <div class="text-right text-sm font-semibold text-gray-400 mb-4">${currentQuestionIndex + 1} / ${questions.length}</div>
@@ -199,14 +260,25 @@
                 <div class="options-container">${optionsHTML}</div>
             `;
             
-            quizContainer.innerHTML = '';
+            quizContainer.innerHTML = ''; 
             quizContainer.appendChild(card);
-            requestAnimationFrame(() => card.classList.remove('card-enter'));
-            card.querySelectorAll('.option').forEach(el => el.addEventListener('click', () => handleOptionSelect(el.querySelector('span').innerText)));
+
+            requestAnimationFrame(() => {
+                card.classList.remove('card-enter');
+            });
+
+            card.querySelectorAll('.option').forEach(optionEl => {
+                optionEl.addEventListener('click', () => handleOptionSelect(optionEl.dataset.value));
+            });
         }
 
-        function handleOptionSelect(answer) {
-            userAnswers.push({ question: questions[currentQuestionIndex].question, answer: answer });
+        function handleOptionSelect(answerKey) {
+            const questionData = questions[currentQuestionIndex];
+            userAnswers.push({ 
+                question: questionData.question, 
+                answer: questionData.options[answerKey] 
+            });
+            
             const card = quizContainer.querySelector('.quiz-card');
             card.classList.add('card-exit');
             
@@ -215,67 +287,70 @@
                 if (currentQuestionIndex < questions.length) {
                     renderQuestion();
                 } else {
-                    const prompt = createQuizPrompt(JSON.stringify(userAnswers));
+                    let userChoices = "";
+                    userAnswers.forEach((item, index) => {
+                        userChoices += `Frage ${index + 1}: ${item.question}\nMeine Wahl: ${item.answer}\n\n`;
+                    });
+                    const prompt = createQuizPrompt(userChoices);
                     triggerAnalysis(prompt);
                 }
             }, 500);
         }
 
         function triggerAnalysis(prompt) {
-            viewContainer.style.display = 'none';
+            document.getElementById('view-container').style.display = 'none';
             skipQuizContainer.style.display = 'none';
             additionalContent.style.display = 'none';
             resultsContainer.style.display = 'block';
-            initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center"><div class="spinner"></div><p class="text-gray-600 mt-4">Verifizierung wird angefordert...</p></div>`;
+            initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center">
+                <div class="spinner"></div>
+                <p class="text-gray-600 mt-4">Ihre Erstanalyse wird erstellt...</p>
+            </div>`;
             
-            // Bypassing Turnstile
-            const messages = [{ role: 'user', content: prompt }];
-            fetchReport(messages);
+            callInitialAnalysis(prompt);
         }
 
         function createQuizPrompt(userChoices) {
-            return `Sie sind ein erstklassiger KI-Karriereberater namens "Karriere-Kompass". Der Benutzer hat den Fragebogen ausgefüllt. Hier sind seine Antworten:
+            return `Sie sind ein erstklassiger KI-Karriereberater namens "Berufs-Kompass". Der Benutzer hat den Fragebogen ausgefüllt. Hier sind seine Antworten:
             ---
             ${userChoices}
             ---
             Bitte geben Sie Ihre Analyse streng im folgenden JSON-Format zurück.
-            Wichtige Regel: Ihre gesamte Antwort muss ein einziges, rohes JSON-Objekt sein, das direkt von JSON.parse() verarbeitet werden kann. Innerhalb von JSON-Zeichenkettenwerten müssen alle doppelten Anführungszeichen (") mit einem Backslash (\\) maskiert werden, z.B. "Er sagte \\"Hallo Welt\\"".
+            Wichtige Regel: Ihre gesamte Antwort muss ein einziges, rohes JSON-Objekt sein, das direkt von JSON.parse() geparst werden kann. Innerhalb von JSON-Zeichenkettenwerten müssen alle doppelten Anführungszeichen (") mit einem Backslash (\\) maskiert werden, z. B. "Er sagte \\"Hallo Welt\\"".
             {
-              "archetype_title": "Ein prägnanter, ansprechender Archetyp-Titel, z.B. Der Risikokontrolleur",
+              "archetype_title": "Ein präziser, ansprechender Archetyp-Titel, z. B. Der Risikokontrolleur",
               "archetype_summary": "Eine Ein-Satz-Zusammenfassung, die die Kernmerkmale dieses Archetyps anschaulich erfasst.",
-              "job_suggestions": ["Nennen Sie die 3 am besten passenden Karrierewege basierend auf der Analyse (Array von Strings)"],
-              "full_report": "Dies ist der vollständige, detaillierte Analysebericht, bitte verwenden Sie das Markdown-Format. Der Bericht sollte enthalten: 1. Eine tiefere Interpretation des Archetyps. 2. Eine detaillierte Analyse seiner Werte und Motivationen. 3. Eine detaillierte Erläuterung der 3 empfohlenen Karrierewege. 4. Einen ermutigenden Abschluss und eine Aufforderung zu Folgefragen."
+              "job_suggestions": ["Geben Sie die 3 am besten passenden Karrierewege basierend auf der Analyse an (Array von Zeichenketten)"],
+              "full_report": "Dies ist der vollständige, detaillierte Analysebericht, bitte verwenden Sie das Markdown-Format. Der Bericht sollte enthalten: 1. Eine tiefere Interpretation des Archetyps. 2. Eine detaillierte Analyse ihrer Werte und Motivationen. 3. Eine detaillierte Erläuterung der 3 empfohlenen Karrierewege. 4. Ein ermutigender Abschluss und eine Aufforderung zu Folgefragen."
             }`;
         }
 
         function createDirectInputPrompt(userInput) {
-            return `Sie sind ein erstklassiger KI-Karriereberater namens "Karriere-Kompass". Ein Benutzer hat ein direktes Gespräch initiiert. Hier ist seine Eingabe:
+            return `Sie sind ein erstklassiger KI-Karriereberater namens "Berufs-Kompass". Ein Benutzer hat ein direktes Gespräch initiiert. Hier ist seine Eingabe:
             ---
             ${userInput}
             ---
             Bitte geben Sie Ihre Analyse streng im folgenden JSON-Format zurück.
-            Wichtige Regel: Ihre gesamte Antwort muss ein einziges, rohes JSON-Objekt sein, das direkt von JSON.parse() verarbeitet werden kann. Innerhalb von JSON-Zeichenkettenwerten müssen alle doppelten Anführungszeichen (") mit einem Backslash (\\) maskiert werden, z.B. "Er sagte \\"Hallo Welt\\"".
+            Wichtige Regel: Ihre gesamte Antwort muss ein einziges, rohes JSON-Objekt sein, das direkt von JSON.parse() geparst werden kann. Innerhalb von JSON-Zeichenkettenwerten müssen alle doppelten Anführungszeichen (") mit einem Backslash (\\) maskiert werden, z. B. "Er sagte \\"Hallo Welt\\"".
             {
-              "archetype_title": "Ein prägnanter, ansprechender Archetyp-Titel",
+              "archetype_title": "Ein präziser, ansprechender Archetyp-Titel",
               "archetype_summary": "Eine Ein-Satz-Zusammenfassung, die die Kernmerkmale des Benutzers anschaulich erfasst.",
-              "job_suggestions": ["Nennen Sie die 3 am besten passenden Karrierewege basierend auf der Analyse (Array von Strings)"],
-              "full_report": "Dies ist der vollständige, detaillierte Analysebericht, bitte verwenden Sie das Markdown-Format. Der Bericht sollte enthalten: 1. Eine tiefe Interpretation der Selbstbeschreibung des Benutzers. 2. Aufdeckung potenzieller Werte und Motivationen. 3. Eine detaillierte Erläuterung der 3 empfohlenen Karrierewege. 4. Einen ermutigenden Abschluss und eine Aufforderung zu Folgefragen."
+              "job_suggestions": ["Geben Sie die 3 am besten passenden Karrierewege basierend auf der Analyse an (Array von Zeichenketten)"],
+              "full_report": "Dies ist der vollständige, detaillierte Analysebericht, bitte verwenden Sie das Markdown-Format. Der Bericht sollte enthalten: 1. Eine tiefe Interpretation der Selbstbeschreibung des Benutzers. 2. Aufdeckung potenzieller Werte und Motivationen. 3. Eine detaillierte Erläuterung der 3 empfohlenen Karrierewege. 4. Ein ermutigender Abschluss und eine Aufforderung zu Folgefragen."
             }`;
         }
 
-        let fullReport = '';
-        let conversationHistory = [];
-
-        async function callInitialAnalysis(prompt, turnstileToken) {
+        async function callInitialAnalysis(prompt) {
              try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         model: "qwen/qwen3-8b:free",
                         messages: [{ role: "user", content: prompt }],
-                        stream: false,
-                        turnstileToken: turnstileToken
+                        stream: false
                     }),
                 });
 
@@ -288,6 +363,7 @@
                 const analysis = JSON.parse(result.choices[0].message.content);
 
                 fullReport = analysis.full_report.replace(/\\"/g, '"');
+
                 let suggestionsHTML = '';
                 if (analysis.job_suggestions && analysis.job_suggestions.length > 0) {
                     suggestionsHTML = `
@@ -296,7 +372,8 @@
                             <div class="flex flex-wrap justify-center gap-3">
                                 ${analysis.job_suggestions.map(job => `<span class="bg-gray-100 text-gray-800 text-sm font-medium px-4 py-2 rounded-full">${job.replace(/\\"/g, '"')}</span>`).join('')}
                             </div>
-                        </div>`;
+                        </div>
+                    `;
                 }
 
                 initialResultContainer.innerHTML = `
@@ -318,15 +395,17 @@
         function showFullReportAndChat() {
             document.getElementById('initial-result').style.display = 'none';
             chatWrapper.style.display = 'block';
+
             const reportHtml = markdownConverter.makeHtml(fullReport);
-            chatHistory.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
+            chatHistoryContainer.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
+
             conversationHistory = [
-                { role: "user", content: "Dies ist mein Umfrageergebnis, bitte beginnen Sie die Analyse:" + JSON.stringify(userAnswers) },
+                { role: "user", content: "Dies ist mein Umfrageergebnis, bitte beginnen Sie mit der Analyse:" + JSON.stringify(userAnswers) },
                 { role: "assistant", content: fullReport }
             ];
         }
 
-        async function callLLM(messages, turnstileToken) {
+        async function callLLM(messages) {
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -335,7 +414,6 @@
                         model: "qwen/qwen3-8b:free",
                         messages: messages,
                         stream: true,
-                        turnstileToken: turnstileToken
                     }),
                 });
 
@@ -349,15 +427,17 @@
                 const botMessageContainer = document.createElement('div');
                 botMessageContainer.className = "flex justify-start mb-3";
                 botMessageContainer.innerHTML = `<div class="bg-gray-100 rounded-lg py-2 px-4 max-w-lg prose"></div>`;
-                chatHistory.appendChild(botMessageContainer);
+                chatHistoryContainer.appendChild(botMessageContainer);
                 const contentElement = botMessageContainer.querySelector('div');
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
+
                     buffer += decoder.decode(value, { stream: true });
                     const lines = buffer.split('\n');
                     buffer = lines.pop(); 
+
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
                             const content = line.substring(6);
@@ -367,23 +447,24 @@
                                 if (chunk.choices[0].delta.content) {
                                     botMessageContent += chunk.choices[0].delta.content;
                                     contentElement.innerHTML = markdownConverter.makeHtml(botMessageContent);
-                                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                                    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
                                 }
                             } catch (e) { console.error('Fehler beim Parsen des Stream-Chunks:', e); }
                         }
                     }
                 }
+
                 conversationHistory.push({ role: "assistant", content: botMessageContent });
+
             } catch (error) {
                 const errorElement = document.createElement('div');
                 errorElement.className = 'text-red-500';
                 errorElement.textContent = `Entschuldigung, ein Fehler ist aufgetreten: ${error.message}`;
-                chatHistory.appendChild(errorElement);
+                chatHistoryContainer.appendChild(errorElement);
             } finally {
                 chatInput.disabled = false;
                 sendBtn.disabled = false;
                 chatInput.focus();
-                if (turnstileWidgetId) turnstile.reset(turnstileWidgetId);
             }
         }
         
@@ -392,55 +473,42 @@
             if (!messageText) return;
 
             const userMessageHTML = `<div class="flex justify-end mb-3"><div class="bg-blue-500 text-white rounded-lg py-2 px-4 max-w-lg">${messageText}</div></div>`;
-            chatHistory.innerHTML += userMessageHTML;
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            chatHistoryContainer.innerHTML += userMessageHTML;
+            chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+
             chatInput.value = '';
             chatInput.disabled = true;
             sendBtn.disabled = true;
 
-            const systemInstruction = `Regel: Sie sind ein KI-Karrierementor namens "Karriere-Kompass". Ihre Antworten müssen kurz sein (versuchen Sie, unter drei Sätzen zu bleiben, verwenden Sie oft Listen) und sich immer um Karriereplanung, Kompetenzerwerb, Ratschläge zur Jobsuche usw. drehen. Wenn der Benutzer eine nicht verwandte Frage stellt (z. B. "Wie ist das Wetter?", "Erzählen Sie einen Witz"), müssen Sie höflich ablehnen und ihn zu Karrierethemen zurückführen.`;
+            const systemInstruction = `Regel: Sie sind ein KI-Karrierementor namens "Berufs-Kompass". Ihre Antworten müssen prägnant sein (versuchen Sie, unter drei Sätzen zu bleiben, verwenden Sie oft Listen) und sich immer um Karriereplanung, Kompetenzerwerb, Ratschläge zur Jobsuche usw. drehen. Wenn der Benutzer eine nicht verwandte Frage stellt (z. B. "Wie ist das Wetter?", "Erzähl mir einen Witz"), müssen Sie höflich ablehnen und ihn wieder auf Karrierethemen lenken.`;
             const messagesForAPI = [...conversationHistory, { role: 'system', content: systemInstruction }, { role: 'user', content: messageText }];
             
-            executeProtectedAction((token) => {
-                conversationHistory.push({ role: 'user', content: messageText });
-                callLLM(messagesForAPI, token);
-            });
+            conversationHistory.push({ role: 'user', content: messageText });
+            callLLM(messagesForAPI);
         }
 
-        function setupEventListeners() {
-            document.getElementById('skip-quiz-btn').addEventListener('click', () => {
-                const card = quizContainer.querySelector('.quiz-card');
-                if (card) card.classList.add('card-exit');
-                setTimeout(() => {
-                    quizContainer.style.display = 'none';
-                    directInputContainer.classList.remove('hidden');
-                    directInputContainer.classList.add('card-enter');
-                    requestAnimationFrame(() => directInputContainer.classList.remove('card-enter'));
-                }, 500);
-            });
-
-            directInputSubmitBtn.addEventListener('click', () => {
-                const userInput = document.getElementById('direct-input-text').value;
-                if (userInput.trim().length < 10) {
-                    alert('Für eine genauere Analyse geben Sie bitte mindestens 10 Zeichen ein.');
-                    return;
-                }
-                const prompt = `Basierend auf der folgenden Selbsteinführung und den Unklarheiten des Benutzers, erstellen Sie einen professionellen Karriereplanungs-Analysebericht. Der Bericht muss enthalten: 1. Kern-Einblicke und Analyse der Persönlichkeitsstärken. 2. 3 Vorschläge für gut passende Karrierewege (einschließlich Berufsbezeichnung, warum es passt und Entwicklungspfad). 3. Einen umsetzbaren Aktionsplan für die nächsten Schritte. Bitte verwenden Sie einen freundlichen, professionellen Mentoren-Ton. Dies ist die Eingabe des Benutzers: "${userInput}"`;
-                
-                // Bypassing Turnstile
-                const messages = [{ role: 'user', content: prompt }];
-                fetchReport(messages);
-            });
-
-            sendBtn.addEventListener('click', handleSendMessage);
-            chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage()));
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderQuestion();
-            setupEventListeners();
+        // --- UI Event Listeners ---
+        document.getElementById('skip-quiz-btn').addEventListener('click', () => {
+            quizContainer.style.display = 'none';
+            directInputContainer.classList.remove('hidden');
         });
-        
+
+        directInputSubmitBtn.addEventListener('click', () => {
+            const userInput = directInputText.value;
+            if (userInput.trim().length < 10) {
+                alert('Für eine genauere Analyse geben Sie bitte mindestens 10 Zeichen ein.');
+                return;
+            }
+            const prompt = createDirectInputPrompt(userInput);
+            triggerAnalysis(prompt);
+        });
+
+        sendBtn.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage()));
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', renderQuestion);
+
     </script>
 </body>
 </html> 

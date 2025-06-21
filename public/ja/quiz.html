@@ -188,85 +188,255 @@
         }
         */
 
-        // --- Core Application Logic ---
+        // --- Core Application Logic (Restored) ---
         const quizContainer = document.getElementById('quiz-container');
         const skipQuizContainer = document.getElementById('skip-quiz-container');
         const directInputContainer = document.getElementById('direct-input-container');
         const resultsContainer = document.getElementById('results-container');
         const additionalContent = document.getElementById('additional-content');
+
         const initialResultContainer = document.getElementById('initial-result');
         const chatWrapper = document.getElementById('chat-wrapper');
-        const chatHistory = document.getElementById('chat-history');
+        const chatHistoryContainer = document.getElementById('chat-history');
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
         const directInputText = document.getElementById('direct-input-text');
         const directInputSubmitBtn = document.getElementById('direct-input-submit-btn');
 
-        directInputSubmitBtn.addEventListener('click', () => {
-            const userInput = directInputText.value;
-            if (userInput.trim().length < 10) {
-                alert('より正確な分析のために、少なくとも10文字以上入力してください。');
-                return;
+        const markdownConverter = new showdown.Converter();
+        let conversationHistory = [];
+        let fullReport = '';
+
+        const questions = [
+            {
+                question: "あなたの理想的なワークライフバランスはどのようなものですか？",
+                options: {
+                    a: "仕事と生活の間に明確な境界線があり、定時勤務で残業はほとんどない。",
+                    b: "仕事は人生の目的の中心であり、将来の報酬のために多くの時間を投資する意欲がある。",
+                    c: "タスクに応じて、深く中断されることのない集中を可能にする柔軟なスケジュールを好む。",
+                    d: "自分の仕事が情熱と融合することを望み、意味のあるタスクのためなら境界が曖昧になることも気にしない。"
+                }
+            },
+            {
+                question: "キャリアにおけるリスクと安定性をどのように考えますか？",
+                options: {
+                    a: "安定性を強く望む。収入の上限が低くても、保証された給与と安定した仕事は安心感を与えてくれる。",
+                    b: "ハイリスク・ハイリターンの機会に興奮し、大きな富を築くために不確実性を受け入れる覚悟がある。",
+                    c: "私の最大の安全保障は、かけがえのないスキルから来る。スキルが求められる限り、失業の心配はない。",
+                    d: "自分が経験した本当の悩みに基づくアイデアであれば、自分のビジネスを始めるリスクをいとわない。"
+                }
+            },
+            {
+                question: "働く上での中心的な動機は何ですか？",
+                options: {
+                    a: "尊敬を得て、安定した生活を送り、体系的なシステムの中で貢献すること。",
+                    b: "富、自由、そして自分の人生をコントロールする力を追求すること。",
+                    c: "選んだ分野でトップクラスの専門家になり、複雑な技術を習得することから得られる達成感を楽しむこと。",
+                    d: "自分や他人に本当の苦痛をもたらした問題を解決し、自分の仕事がポジティブな変化を生み出すのを見ること。"
+                }
+            },
+            {
+                question: "どのような環境で働くことを好みますか？",
+                options: {
+                    a: "明確なルール、階層、プロセスがある大規模で成熟した組織。",
+                    b: "チームを構築・リードし、ビジネスを推進できるダイナミックでペースの速い環境。",
+                    c: "専門的な業務に集中できる高い自律性を持つ役割。",
+                    d: "自分で、あるいは非常に小さなチームで、サービスを提供する顧客と直接接触しながら働くこと。"
+                }
+            },
+            {
+                question: "新しい課題に直面したとき、どのように解決する傾向がありますか？",
+                options: {
+                    a: "公平性と一貫性を確保するために、確立された手順と基準に従う。",
+                    b: "型にはまらないとしても、市場のギャップや革新的な機会を探す。",
+                    c: "複雑な技術的問題を小さな部分に分解し、一つずつ取り組む。",
+                    d: "個人的な「ペインポイント」から始め、自分の経験を活かして解決策を構築する。"
+                }
             }
-            const prompt = `ユーザーの以下の自己紹介と悩みに基づき、専門的なキャリアプランニング分析レポートを作成してください。レポートには以下を含める必要があります：1. 中核となる洞察と性格の強み分析。2. 非常に一致度の高い3つのキャリア方向性の提案（役職名、適合理由、開発パスを含む）。3. 実行可能な次のステップのアクションプラン。フレンドリーでプロフェッショナルなメンターの口調で出力してください。これがユーザーの入力です：「${userInput}」`;
+        ];
+
+        let currentQuestionIndex = 0;
+        const userAnswers = [];
+
+        function renderQuestion() {
+            const cardData = questions[currentQuestionIndex];
             
-            // Bypassing Turnstile
-            const messages = [{ role: 'user', content: prompt }];
-            fetchReport(messages);
-        });
-
-        function submitQuiz() {
-            const userAnswers = questions.map(q => `質問 ${q.id} (「${q.question}」) の答え：「${q.answer}」`).join('\n');
-            const prompt = `ユーザーの以下の5つの質問への回答に基づき、専門的なキャリアプランニング分析レポートを作成してください。レポートには以下を含める必要があります：1. 中核となる洞察と性格の強み分析。2. 非常に一致度の高い3つのキャリア方向性の提案（役職名、適合理由、開発パスを含む）。3. 実行可能な次のステップのアクションプラン。フレンドリーでプロフェッショナルなメンターの口調を使用してください。ユーザーの回答は以下の通りです：\n${userAnswers}`;
+            const card = document.createElement('div');
+            card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
             
-            // Bypassing Turnstile
-            const messages = [{ role: 'user', content: prompt }];
-            fetchReport(messages);
+            let optionsHTML = '';
+            for (const key in cardData.options) {
+                optionsHTML += `
+                    <div class="option border rounded-lg p-4 mb-3 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition" data-value="${key}">
+                        <span class="font-semibold text-gray-500 mr-3">${key.toUpperCase()})</span>
+                        <span>${cardData.options[key]}</span>
+                    </div>`;
+            }
+
+            card.innerHTML = `
+                <div class="text-right text-sm font-semibold text-gray-400 mb-4">${currentQuestionIndex + 1} / ${questions.length}</div>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-8">${cardData.question}</h2>
+                <div class="options-container">${optionsHTML}</div>
+            `;
+            
+            quizContainer.innerHTML = ''; 
+            quizContainer.appendChild(card);
+
+            requestAnimationFrame(() => {
+                card.classList.remove('card-enter');
+            });
+
+            card.querySelectorAll('.option').forEach(optionEl => {
+                optionEl.addEventListener('click', () => handleOptionSelect(optionEl.dataset.value));
+            });
         }
 
-        function fetchReport(messages) {
-            showLoadingState();
-
-            // The payload no longer includes the turnstile token.
-            const payload = {
-                model: 'openai/gpt-4o',
-                messages: messages,
-                stream: true
-            };
-
-            streamChat(payload);
+        function handleOptionSelect(answerKey) {
+            const questionData = questions[currentQuestionIndex];
+            userAnswers.push({ 
+                question: questionData.question, 
+                answer: questionData.options[answerKey] 
+            });
+            
+            const card = quizContainer.querySelector('.quiz-card');
+            card.classList.add('card-exit');
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    renderQuestion();
+                } else {
+                    let userChoices = "";
+                    userAnswers.forEach((item, index) => {
+                        userChoices += `質問 ${index + 1}: ${item.question}\n私の選択: ${item.answer}\n\n`;
+                    });
+                    const prompt = createQuizPrompt(userChoices);
+                    triggerAnalysis(prompt);
+                }
+            }, 500);
         }
 
-        function sendFollowUp() {
-            const userInput = chatInput.value.trim();
-            if (!userInput) return;
-
-            addMessageToHistory('user', userInput);
-            chatInput.value = '';
-
-            // Bypassing Turnstile for follow-up
-            const currentHistory = [...chatHistory];
-            currentHistory.push({ role: 'user', content: userInput });
-            const payload = {
-                model: 'openai/gpt-4o',
-                messages: currentHistory,
-                stream: true
-            };
-            streamChat(payload);
+        function triggerAnalysis(prompt) {
+            document.getElementById('view-container').style.display = 'none';
+            skipQuizContainer.style.display = 'none';
+            additionalContent.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center">
+                <div class="spinner"></div>
+                <p class="text-gray-600 mt-4">初期分析を生成中...</p>
+            </div>`;
+            
+            callInitialAnalysis(prompt);
         }
 
-        async function streamChat(payload) {
-            try {
+        function createQuizPrompt(userChoices) {
+            return `あなたは「キャリアコンパス」という名前の一流AIキャリアアドバイザーです。ユーザーがアンケートに回答しました。以下がその選択肢です。
+            ---
+            ${userChoices}
+            ---
+            分析結果を厳密に以下のJSON形式で返してください。
+            重要ルール：応答全体は、JSON.parse()で直接解析できる単一の生のJSONオブジェクトでなければなりません。JSON文字列の値の中では、すべての二重引用符（"）をバックスラッシュ（\\）でエスケープする必要があります。例：「彼は\\"こんにちは\\"と言った」。
+            {
+              "archetype_title": "正確で魅力的なアーキタイプタイトル、例：リスクコントローラー",
+              "archetype_summary": "このアーキタイプの核心的な特徴を鮮やかに捉えた一文の要約。",
+              "job_suggestions": ["分析に基づいた最適な3つのキャリアパスを提供してください（文字列の配列）"],
+              "full_report": "これは完全で詳細な分析レポートです。Markdown形式を使用してください。レポートには以下を含める必要があります：1. アーキタイプのより深い解釈。2. 彼らの価値観と動機の詳細な分析。3. 推奨される3つのキャリアパスの詳細な説明。4. 励ましの言葉とフォローアップの質問を促す言葉。"
+            }`;
+        }
+
+        function createDirectInputPrompt(userInput) {
+            return `あなたは「キャリアコンパス」という名前の一流AIキャリアアドバイザーです。ユーザーが直接対話を開始しました。以下がその入力です。
+            ---
+            ${userInput}
+            ---
+            分析結果を厳密に以下のJSON形式で返してください。
+            重要ルール：応答全体は、JSON.parse()で直接解析できる単一の生のJSONオブジェクトでなければなりません。JSON文字列の値の中では、すべての二重引用符（"）をバックスラッシュ（\\）でエスケープする必要があります。例：「彼は\\"こんにちは\\"と言った」。
+            {
+              "archetype_title": "正確で魅力的なアーキタイプタイトル",
+              "archetype_summary": "ユーザーの核心的な特徴を鮮やかに捉えた一文の要約。",
+              "job_suggestions": ["分析に基づいた最適な3つのキャリアパスを提供してください（文字列の配列）"],
+              "full_report": "これは完全で詳細な分析レポートです。Markdown形式を使用してください。レポートには以下を含める必要があります：1. ユーザーの自己記述の深い解釈。2. 潜在的な価値観と動機の発見。3. 推奨される3つのキャリアパスの詳細な説明。4. 励ましの言葉とフォローアップの質問を促す言葉。"
+            }`;
+        }
+
+        async function callInitialAnalysis(prompt) {
+             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: "qwen/qwen3-8b:free",
+                        messages: [{ role: "user", content: prompt }],
+                        stream: false
+                    }),
                 });
 
                 if (!response.ok) {
                     const errorBody = await response.text();
                     throw new Error(`API呼び出しに失敗しました: ${response.status}. ${errorBody}`);
                 }
+
+                const result = await response.json();
+                const analysis = JSON.parse(result.choices[0].message.content);
+
+                fullReport = analysis.full_report.replace(/\\"/g, '"');
+
+                let suggestionsHTML = '';
+                if (analysis.job_suggestions && analysis.job_suggestions.length > 0) {
+                    suggestionsHTML = `
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <p class="text-sm font-semibold text-gray-500 mb-4">あなたへのおすすめのキャリアパス：</p>
+                            <div class="flex flex-wrap justify-center gap-3">
+                                ${analysis.job_suggestions.map(job => `<span class="bg-gray-100 text-gray-800 text-sm font-medium px-4 py-2 rounded-full">${job.replace(/\\"/g, '"')}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                initialResultContainer.innerHTML = `
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-blue-600 mb-3">${analysis.archetype_title.replace(/\\"/g, '"')}</h2>
+                    <p class="text-lg text-gray-700 max-w-2xl mx-auto">${analysis.archetype_summary.replace(/\\"/g, '"')}</p>
+                    ${suggestionsHTML}
+                    <button id="show-full-report-btn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-10">
+                        完全な分析を表示してチャットを開始
+                    </button>
+                `;
+
+                document.getElementById('show-full-report-btn').addEventListener('click', showFullReportAndChat);
+
+            } catch (error) {
+                initialResultContainer.innerHTML = `<div class="text-red-500">申し訳ありませんが、分析中にエラーが発生しました: ${error.message}</div>`;
+            }
+        }
+        
+        function showFullReportAndChat() {
+            document.getElementById('initial-result').style.display = 'none';
+            chatWrapper.style.display = 'block';
+
+            const reportHtml = markdownConverter.makeHtml(fullReport);
+            chatHistoryContainer.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
+
+            conversationHistory = [
+                { role: "user", content: "これが私のアンケート結果です。分析を開始してください：" + JSON.stringify(userAnswers) },
+                { role: "assistant", content: fullReport }
+            ];
+        }
+
+        async function callLLM(messages) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: "qwen/qwen3-8b:free",
+                        messages: messages,
+                        stream: true,
+                    }),
+                });
+
+                if (!response.ok) throw new Error(`API呼び出しに失敗しました: ${response.status}. ${await response.text()}`);
                 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
@@ -276,15 +446,17 @@
                 const botMessageContainer = document.createElement('div');
                 botMessageContainer.className = "flex justify-start mb-3";
                 botMessageContainer.innerHTML = `<div class="bg-gray-100 rounded-lg py-2 px-4 max-w-lg prose"></div>`;
-                chatHistory.appendChild(botMessageContainer);
+                chatHistoryContainer.appendChild(botMessageContainer);
                 const contentElement = botMessageContainer.querySelector('div');
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
+
                     buffer += decoder.decode(value, { stream: true });
                     const lines = buffer.split('\n');
                     buffer = lines.pop(); 
+
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
                             const content = line.substring(6);
@@ -294,43 +466,68 @@
                                 if (chunk.choices[0].delta.content) {
                                     botMessageContent += chunk.choices[0].delta.content;
                                     contentElement.innerHTML = markdownConverter.makeHtml(botMessageContent);
-                                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                                    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
                                 }
-                            } catch (e) { console.error('ストリームチャンクの解析中にエラー:', e); }
+                            } catch (e) { console.error('ストリームチャンクの解析中にエラーが発生しました:', e); }
                         }
                     }
                 }
+
                 conversationHistory.push({ role: "assistant", content: botMessageContent });
+
             } catch (error) {
                 const errorElement = document.createElement('div');
                 errorElement.className = 'text-red-500';
                 errorElement.textContent = `申し訳ありませんが、エラーが発生しました: ${error.message}`;
-                chatHistory.appendChild(errorElement);
+                chatHistoryContainer.appendChild(errorElement);
             } finally {
                 chatInput.disabled = false;
                 sendBtn.disabled = false;
                 chatInput.focus();
             }
         }
+        
+        async function handleSendMessage() {
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
 
-        function setupEventListeners() {
-            document.getElementById('skip-quiz-btn').addEventListener('click', () => {
-                const card = quizContainer.querySelector('.quiz-card');
-                if (card) card.classList.add('card-exit');
-                setTimeout(() => {
-                    quizContainer.style.display = 'none';
-                    directInputContainer.classList.remove('hidden');
-                    directInputContainer.classList.add('card-enter');
-                    requestAnimationFrame(() => directInputContainer.classList.remove('card-enter'));
-                }, 500);
-            });
+            const userMessageHTML = `<div class="flex justify-end mb-3"><div class="bg-blue-500 text-white rounded-lg py-2 px-4 max-w-lg">${messageText}</div></div>`;
+            chatHistoryContainer.innerHTML += userMessageHTML;
+            chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+
+            chatInput.value = '';
+            chatInput.disabled = true;
+            sendBtn.disabled = true;
+
+            const systemInstruction = `ルール：あなたは「キャリアコンパス」という名前のAIキャリアメンターです。回答は簡潔に（3文以内に収め、リストを多用するようにしてください）、常にキャリアプランニング、スキルアップ、就職活動のアドバイスなどを中心に展開してください。ユーザーが関係のない質問（例：「天気はどう？」、「冗談を言って」）をした場合は、丁寧に断り、キャリアの話題に戻すようにしてください。`;
+            const messagesForAPI = [...conversationHistory, { role: 'system', content: systemInstruction }, { role: 'user', content: messageText }];
+            
+            conversationHistory.push({ role: 'user', content: messageText });
+            callLLM(messagesForAPI);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            renderQuestion();
-            setupEventListeners();
+        // --- UI Event Listeners ---
+        document.getElementById('skip-quiz-btn').addEventListener('click', () => {
+            quizContainer.style.display = 'none';
+            directInputContainer.classList.remove('hidden');
         });
-        
+
+        directInputSubmitBtn.addEventListener('click', () => {
+            const userInput = directInputText.value;
+            if (userInput.trim().length < 10) {
+                alert('より正確な分析のために、10文字以上入力してください。');
+                return;
+            }
+            const prompt = createDirectInputPrompt(userInput);
+            triggerAnalysis(prompt);
+        });
+
+        sendBtn.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage()));
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', renderQuestion);
+
     </script>
 </body>
 </html> 

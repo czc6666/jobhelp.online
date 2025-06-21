@@ -173,84 +173,90 @@
         }
         */
 
-        // --- Core Application Logic ---
+        // --- Core Application Logic (Restored) ---
         const quizContainer = document.getElementById('quiz-container');
         const skipQuizContainer = document.getElementById('skip-quiz-container');
         const directInputContainer = document.getElementById('direct-input-container');
         const resultsContainer = document.getElementById('results-container');
         const additionalContent = document.getElementById('additional-content');
+
         const initialResultContainer = document.getElementById('initial-result');
         const chatWrapper = document.getElementById('chat-wrapper');
-        const chatHistory = document.getElementById('chat-history');
+        const chatHistoryContainer = document.getElementById('chat-history');
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
         const directInputText = document.getElementById('direct-input-text');
         const directInputSubmitBtn = document.getElementById('direct-input-submit-btn');
+        
+        const markdownConverter = new showdown.Converter();
+        let conversationHistory = [];
+        let fullReport = '';
 
         const questions = [
             {
-                question: "Imagina que estás en una fiesta informal. ¿Qué actividad te atraería más?",
-                options: [
-                    "Tener una conversación profunda y personal con un amigo cercano.",
-                    "Observar a la gente y analizar las dinámicas sociales.",
-                    "Participar en un juego de mesa animado o una actividad de grupo.",
-                    "Ayudar al anfitrión a organizar la comida o asegurarse de que todos se diviertan."
-                ]
+                question: "¿Cómo es tu equilibrio ideal entre trabajo y vida personal?",
+                options: {
+                    a: "Límites claros entre el trabajo y la vida, con un horario fijo y horas extras poco frecuentes.",
+                    b: "El trabajo es fundamental para mi propósito de vida; estoy dispuesto a invertir un tiempo considerable para obtener recompensas futuras.",
+                    c: "Prefiero un horario flexible que me permita concentrarme profundamente en las tareas sin interrupciones.",
+                    d: "Quiero que mi trabajo se fusione con mi pasión; no me importa difuminar los límites si las tareas son significativas."
+                }
             },
             {
-                question: "Si tuvieras un fin de semana completamente libre, ¿cómo lo pasarías idealmente?",
-                options: [
-                    "Leyendo un libro, aprendiendo una nueva habilidad o viendo un documental.",
-                    "Creando algo: escribir, dibujar, componer música o un proyecto de bricolaje.",
-                    "Haciendo senderismo, practicando un deporte o realizando alguna otra actividad física al aire libre.",
-                    "Pasando tiempo de calidad con la familia o los amigos."
-                ]
+                question: "¿Cómo ves el riesgo frente a la estabilidad en tu carrera?",
+                options: {
+                    a: "Prefiero firmemente la estabilidad; un salario garantizado y un trabajo seguro me hacen sentir a salvo, incluso con un techo de ingresos más bajo.",
+                    b: "Me entusiasman las oportunidades de alto riesgo y alta recompensa y estoy dispuesto a aceptar la incertidumbre para crear una gran riqueza.",
+                    c: "Mi mayor seguridad proviene de mis habilidades irremplazables; no me preocupa el desempleo mientras mis habilidades tengan demanda.",
+                    d: "Estoy dispuesto a correr el riesgo de empezar mi propio negocio si la idea se basa en un problema real que he experimentado."
+                }
             },
             {
-                question: "Al enfrentarte a un problema complejo en el trabajo, ¿cuál es tu enfoque inicial?",
-                options: [
-                    "Recopilar y analizar datos para entender la causa raíz.",
-                    "Hacer una lluvia de ideas de soluciones creativas y poco convencionales.",
-                    "Organizar un equipo y delegar tareas para abordarlo desde múltiples ángulos.",
-                    "Considerar el impacto del problema en los miembros del equipo y los clientes."
-                ]
+                question: "¿Cuál es tu principal motivación para trabajar?",
+                options: {
+                    a: "Obtener respeto, tener una vida estable y contribuir dentro de un sistema estructurado.",
+                    b: "Buscar la riqueza, la libertad y el poder de controlar mi propia vida.",
+                    c: "Convertirme en un experto de primer nivel en mi campo elegido y disfrutar de la sensación de logro que se obtiene al dominar un oficio complejo.",
+                    d: "Resolver un problema que me ha causado un dolor real a mí o a otros y ver que mi trabajo crea un cambio positivo."
+                }
             },
             {
-                question: "¿Qué te motiva más en una carrera?",
-                options: [
-                    "El dominio de una habilidad y convertirte en un experto en tu campo.",
-                    "La oportunidad de expresar tu creatividad e innovar.",
-                    "El liderazgo, la influencia y el logro de metas ambiciosas.",
-                    "Ayudar a otros y tener un impacto positivo en la sociedad."
-                ]
+                question: "¿En qué tipo de entorno prefieres trabajar?",
+                options: {
+                    a: "En una organización grande y madura con reglas, jerarquías y procesos claros.",
+                    b: "En un entorno dinámico y de ritmo rápido donde pueda crear, liderar un equipo e impulsar el negocio.",
+                    c: "En un puesto con alta autonomía que me permita concentrarme en mis tareas profesionales sin distracciones.",
+                    d: "Trabajando para mí mismo o en un equipo muy pequeño con contacto directo con los clientes a los que sirvo."
+                }
             },
             {
-                question: "¿Qué tipo de ambiente de trabajo prefieres?",
-                options: [
-                    "Un entorno tranquilo y estructurado donde puedas concentrarte en tus tareas.",
-                    "Un entorno dinámico y flexible que fomente la experimentación.",
-                    "Un entorno competitivo y orientado a resultados con objetivos claros.",
-                    "Un entorno colaborativo y de apoyo centrado en el trabajo en equipo."
-                ]
+                question: "Cuando te enfrentas a un nuevo desafío, ¿cómo sueles resolverlo?",
+                options: {
+                    a: "Sigo los procedimientos y normas establecidos para garantizar la equidad y la coherencia.",
+                    b: "Busco lagunas en el mercado y oportunidades innovadoras, aunque eso signifique romper moldes.",
+                    c: "Descompongo problemas técnicos complejos en partes más pequeñas y los abordo uno por uno.",
+                    d: "Parto de un 'punto de dolor' personal y utilizo mi propia experiencia para construir una solución."
+                }
             }
         ];
 
         let currentQuestionIndex = 0;
         const userAnswers = [];
-        const markdownConverter = new showdown.Converter({ simplifiedAutoLink: true, tables: true, strikethrough: true });
 
-        const viewContainer = document.getElementById('view-container');
-        
         function renderQuestion() {
             const cardData = questions[currentQuestionIndex];
+            
             const card = document.createElement('div');
             card.className = 'quiz-card bg-white rounded-xl shadow-lg p-6 md:p-10 card-enter';
             
-            const optionsHTML = cardData.options.map(option => `
-                <div class="option border rounded-lg p-4 mb-3 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition">
-                    <span>${option}</span>
-                </div>`
-            ).join('');
+            let optionsHTML = '';
+            for (const key in cardData.options) {
+                optionsHTML += `
+                    <div class="option border rounded-lg p-4 mb-3 cursor-pointer hover:bg-blue-50 hover:border-blue-500 transition" data-value="${key}">
+                        <span class="font-semibold text-gray-500 mr-3">${key.toUpperCase()})</span>
+                        <span>${cardData.options[key]}</span>
+                    </div>`;
+            }
 
             card.innerHTML = `
                 <div class="text-right text-sm font-semibold text-gray-400 mb-4">${currentQuestionIndex + 1} / ${questions.length}</div>
@@ -258,14 +264,25 @@
                 <div class="options-container">${optionsHTML}</div>
             `;
             
-            quizContainer.innerHTML = '';
+            quizContainer.innerHTML = ''; 
             quizContainer.appendChild(card);
-            requestAnimationFrame(() => card.classList.remove('card-enter'));
-            card.querySelectorAll('.option').forEach(el => el.addEventListener('click', () => handleOptionSelect(el.querySelector('span').innerText)));
+
+            requestAnimationFrame(() => {
+                card.classList.remove('card-enter');
+            });
+
+            card.querySelectorAll('.option').forEach(optionEl => {
+                optionEl.addEventListener('click', () => handleOptionSelect(optionEl.dataset.value));
+            });
         }
 
-        function handleOptionSelect(answer) {
-            userAnswers.push({ question: questions[currentQuestionIndex].question, answer: answer });
+        function handleOptionSelect(answerKey) {
+            const questionData = questions[currentQuestionIndex];
+            userAnswers.push({ 
+                question: questionData.question, 
+                answer: questionData.options[answerKey] 
+            });
+            
             const card = quizContainer.querySelector('.quiz-card');
             card.classList.add('card-exit');
             
@@ -274,67 +291,70 @@
                 if (currentQuestionIndex < questions.length) {
                     renderQuestion();
                 } else {
-                    const prompt = createQuizPrompt(JSON.stringify(userAnswers));
+                    let userChoices = "";
+                    userAnswers.forEach((item, index) => {
+                        userChoices += `Pregunta ${index + 1}: ${item.question}\nMi elección: ${item.answer}\n\n`;
+                    });
+                    const prompt = createQuizPrompt(userChoices);
                     triggerAnalysis(prompt);
                 }
             }, 500);
         }
 
         function triggerAnalysis(prompt) {
-            viewContainer.style.display = 'none';
+            document.getElementById('view-container').style.display = 'none';
             skipQuizContainer.style.display = 'none';
             additionalContent.style.display = 'none';
             resultsContainer.style.display = 'block';
-            initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center"><div class="spinner"></div><p class="text-gray-600 mt-4">Solicitando verificación...</p></div>`;
+            initialResultContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center">
+                <div class="spinner"></div>
+                <p class="text-gray-600 mt-4">Generando su análisis inicial...</p>
+            </div>`;
             
-            // Bypassing Turnstile
-            const messages = [{ role: 'user', content: prompt }];
-            fetchReport(messages);
+            callInitialAnalysis(prompt);
         }
 
         function createQuizPrompt(userChoices) {
-            return `Eres un asesor de carrera de IA de primer nivel llamado "Brújula Profesional". El usuario ha completado el cuestionario. Aquí están sus elecciones:
+            return `Eres un asesor de carrera de IA de primer nivel llamado "Orientación Profesional". El usuario ha completado el cuestionario. Estas son sus elecciones:
             ---
             ${userChoices}
             ---
             Por favor, devuelve tu análisis estrictamente en el siguiente formato JSON.
-            Regla importante: Tu respuesta completa debe ser un único objeto JSON crudo que pueda ser analizado directamente por JSON.parse(). Dentro de los valores de cadena de JSON, todas las comillas dobles (") deben escaparse con una barra invertida (\\), ej., "Él dijo \\"hola mundo\\"".
+            Regla importante: Tu respuesta completa debe ser un único objeto JSON sin formato que pueda ser analizado directamente por JSON.parse(). Dentro de los valores de cadena de JSON, todas las comillas dobles (") deben escaparse con una barra invertida (\\), por ejemplo, "Él dijo \\"hola mundo\\"".
             {
-              "archetype_title": "Un título de arquetipo preciso y atractivo, ej., El Controlador de Riesgos",
+              "archetype_title": "Un título de arquetipo preciso y atractivo, ej.: El Controlador de Riesgos",
               "archetype_summary": "Un resumen de una frase que capture vívidamente los rasgos centrales de este arquetipo.",
               "job_suggestions": ["Proporciona las 3 trayectorias profesionales que mejor coincidan según el análisis (array de strings)"],
-              "full_report": "Este es el informe de análisis completo y detallado, por favor usa el formato Markdown. El informe debe incluir: 1. Una interpretación más profunda del arquetipo. 2. Un análisis detallado de sus valores y motivaciones. 3. Una explicación detallada de las 3 trayectorias profesionales recomendadas. 4. Un cierre alentador y una pregunta para seguimiento."
+              "full_report": "Este es el informe de análisis completo y detallado, por favor usa el formato Markdown. El informe debe incluir: 1. Una interpretación más profunda del arquetipo. 2. Un análisis detallado de sus valores y motivaciones. 3. Una explicación detallada de las 3 trayectorias profesionales recomendadas. 4. Un cierre alentador y una invitación a hacer preguntas de seguimiento."
             }`;
         }
 
         function createDirectInputPrompt(userInput) {
-            return `Eres un asesor de carrera de IA de primer nivel llamado "Brújula Profesional". Un usuario ha iniciado una conversación directa. Aquí está su entrada:
+            return `Eres un asesor de carrera de IA de primer nivel llamado "Orientación Profesional". Un usuario ha iniciado una conversación directa. Esta es su entrada:
             ---
             ${userInput}
             ---
             Por favor, devuelve tu análisis estrictamente en el siguiente formato JSON.
-            Regla importante: Tu respuesta completa debe ser un único objeto JSON crudo que pueda ser analizado directamente por JSON.parse(). Dentro de los valores de cadena de JSON, todas las comillas dobles (") deben escaparse con una barra invertida (\\), ej., "Él dijo \\"hola mundo\\"".
+            Regla importante: Tu respuesta completa debe ser un único objeto JSON sin formato que pueda ser analizado directamente por JSON.parse(). Dentro de los valores de cadena de JSON, todas las comillas dobles (") deben escaparse con una barra invertida (\\), por ejemplo, "Él dijo \\"hola mundo\\"".
             {
               "archetype_title": "Un título de arquetipo preciso y atractivo",
               "archetype_summary": "Un resumen de una frase que capture vívidamente los rasgos centrales del usuario.",
               "job_suggestions": ["Proporciona las 3 trayectorias profesionales que mejor coincidan según el análisis (array de strings)"],
-              "full_report": "Este es el informe de análisis completo y detallado, por favor usa el formato Markdown. El informe debe incluir: 1. Una interpretación profunda de la autodescripción del usuario. 2. Descubrir valores y motivaciones potenciales. 3. Una explicación detallada de las 3 trayectorias profesionales recomendadas. 4. Un cierre alentador y una pregunta para seguimiento."
+              "full_report": "Este es el informe de análisis completo y detallado, por favor usa el formato Markdown. El informe debe incluir: 1. Una interpretación profunda de la autodescripción del usuario. 2. El descubrimiento de valores y motivaciones potenciales. 3. Una explicación detallada de las 3 trayectorias profesionales recomendadas. 4. Un cierre alentador y una invitación a hacer preguntas de seguimiento."
             }`;
         }
 
-        let fullReport = '';
-        let conversationHistory = [];
-
-        async function callInitialAnalysis(prompt, turnstileToken) {
+        async function callInitialAnalysis(prompt) {
              try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         model: "qwen/qwen3-8b:free",
                         messages: [{ role: "user", content: prompt }],
-                        stream: false,
-                        turnstileToken: turnstileToken
+                        stream: false
                     }),
                 });
 
@@ -347,6 +367,7 @@
                 const analysis = JSON.parse(result.choices[0].message.content);
 
                 fullReport = analysis.full_report.replace(/\\"/g, '"');
+
                 let suggestionsHTML = '';
                 if (analysis.job_suggestions && analysis.job_suggestions.length > 0) {
                     suggestionsHTML = `
@@ -355,7 +376,8 @@
                             <div class="flex flex-wrap justify-center gap-3">
                                 ${analysis.job_suggestions.map(job => `<span class="bg-gray-100 text-gray-800 text-sm font-medium px-4 py-2 rounded-full">${job.replace(/\\"/g, '"')}</span>`).join('')}
                             </div>
-                        </div>`;
+                        </div>
+                    `;
                 }
 
                 initialResultContainer.innerHTML = `
@@ -363,7 +385,7 @@
                     <p class="text-lg text-gray-700 max-w-2xl mx-auto">${analysis.archetype_summary.replace(/\\"/g, '"')}</p>
                     ${suggestionsHTML}
                     <button id="show-full-report-btn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-base inline-block hover:bg-blue-700 transition mt-10">
-                        Ver Análisis Completo y Iniciar Chat
+                        Ver análisis completo e iniciar chat
                     </button>
                 `;
 
@@ -377,15 +399,17 @@
         function showFullReportAndChat() {
             document.getElementById('initial-result').style.display = 'none';
             chatWrapper.style.display = 'block';
+
             const reportHtml = markdownConverter.makeHtml(fullReport);
-            chatHistory.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
+            chatHistoryContainer.innerHTML = `<div class="prose max-w-none p-2">${reportHtml}</div>`;
+
             conversationHistory = [
                 { role: "user", content: "Este es el resultado de mi cuestionario, por favor comienza el análisis:" + JSON.stringify(userAnswers) },
                 { role: "assistant", content: fullReport }
             ];
         }
 
-        async function callLLM(messages, turnstileToken) {
+        async function callLLM(messages) {
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -394,7 +418,6 @@
                         model: "qwen/qwen3-8b:free",
                         messages: messages,
                         stream: true,
-                        turnstileToken: turnstileToken
                     }),
                 });
 
@@ -408,15 +431,17 @@
                 const botMessageContainer = document.createElement('div');
                 botMessageContainer.className = "flex justify-start mb-3";
                 botMessageContainer.innerHTML = `<div class="bg-gray-100 rounded-lg py-2 px-4 max-w-lg prose"></div>`;
-                chatHistory.appendChild(botMessageContainer);
+                chatHistoryContainer.appendChild(botMessageContainer);
                 const contentElement = botMessageContainer.querySelector('div');
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
+
                     buffer += decoder.decode(value, { stream: true });
                     const lines = buffer.split('\n');
                     buffer = lines.pop(); 
+
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
                             const content = line.substring(6);
@@ -426,23 +451,24 @@
                                 if (chunk.choices[0].delta.content) {
                                     botMessageContent += chunk.choices[0].delta.content;
                                     contentElement.innerHTML = markdownConverter.makeHtml(botMessageContent);
-                                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                                    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
                                 }
                             } catch (e) { console.error('Error al analizar el fragmento del stream:', e); }
                         }
                     }
                 }
+
                 conversationHistory.push({ role: "assistant", content: botMessageContent });
+
             } catch (error) {
                 const errorElement = document.createElement('div');
                 errorElement.className = 'text-red-500';
                 errorElement.textContent = `Lo sentimos, ocurrió un error: ${error.message}`;
-                chatHistory.appendChild(errorElement);
+                chatHistoryContainer.appendChild(errorElement);
             } finally {
                 chatInput.disabled = false;
                 sendBtn.disabled = false;
                 chatInput.focus();
-                if (turnstileWidgetId) turnstile.reset(turnstileWidgetId);
             }
         }
         
@@ -451,150 +477,42 @@
             if (!messageText) return;
 
             const userMessageHTML = `<div class="flex justify-end mb-3"><div class="bg-blue-500 text-white rounded-lg py-2 px-4 max-w-lg">${messageText}</div></div>`;
-            chatHistory.innerHTML += userMessageHTML;
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            chatHistoryContainer.innerHTML += userMessageHTML;
+            chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+
             chatInput.value = '';
             chatInput.disabled = true;
             sendBtn.disabled = true;
 
-            const systemInstruction = `Regla: Eres un mentor de carrera de IA llamado "Brújula Profesional". Tus respuestas deben ser concisas (intenta no pasar de tres frases, usa listas a menudo) y siempre deben girar en torno a la planificación de carrera, mejora de habilidades, consejos para la búsqueda de empleo, etc. Si el usuario hace una pregunta no relacionada (ej., "¿qué tiempo hace?", "cuéntame un chiste"), debes negarte cortésmente y guiarlo de vuelta a temas de carrera.`;
+            const systemInstruction = `Regla: Eres un mentor de carrera de IA llamado "Orientación Profesional". Tus respuestas deben ser concisas (intenta no pasar de tres frases, usa listas a menudo) y siempre deben girar en torno a la planificación de carrera, mejora de habilidades, consejos para la búsqueda de empleo, etc. Si el usuario hace una pregunta no relacionada (por ejemplo, "¿qué tiempo hace?", "cuéntame un chiste"), debes negarte cortésmente y guiarlo de nuevo hacia temas de carrera.`;
             const messagesForAPI = [...conversationHistory, { role: 'system', content: systemInstruction }, { role: 'user', content: messageText }];
             
-            // Bypassing Turnstile
-            const messages = [{ role: 'user', content: messageText }];
-            fetchReport(messages);
+            conversationHistory.push({ role: 'user', content: messageText });
+            callLLM(messagesForAPI);
         }
 
-        function setupEventListeners() {
-            document.getElementById('skip-quiz-btn').addEventListener('click', () => {
-                const card = quizContainer.querySelector('.quiz-card');
-                if (card) card.classList.add('card-exit');
-                setTimeout(() => {
-                    quizContainer.style.display = 'none';
-                    directInputContainer.classList.remove('hidden');
-                    directInputContainer.classList.add('card-enter');
-                    requestAnimationFrame(() => directInputContainer.classList.remove('card-enter'));
-                }, 500);
-            });
-
-            document.getElementById('direct-input-submit-btn').addEventListener('click', () => {
-                const userInput = directInputText.value;
-                if (userInput.trim().length < 10) {
-                    alert('Para un análisis más preciso, por favor ingresa al menos 10 caracteres.');
-                    return;
-                }
-                const prompt = `Basado en la siguiente auto-introducción y confusión del usuario, genera un informe profesional de análisis de planificación de carrera para él. El informe debe incluir: 1. Perspectivas clave y análisis de fortalezas de la personalidad. 2. 3 sugerencias de dirección de carrera altamente compatibles (incluyendo título del puesto, por qué es adecuado y la trayectoria de desarrollo). 3. Un plan de acción ejecutable de próximos pasos. Por favor, utiliza un tono de mentor amigable y profesional. Esta es la entrada del usuario: "${userInput}"`;
-                
-                // Bypassing Turnstile
-                const messages = [{ role: 'user', content: prompt }];
-                fetchReport(messages);
-            });
-
-            sendBtn.addEventListener('click', handleSendMessage);
-            chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage()));
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderQuestion();
-            setupEventListeners();
+        // --- UI Event Listeners ---
+        document.getElementById('skip-quiz-btn').addEventListener('click', () => {
+            quizContainer.style.display = 'none';
+            directInputContainer.classList.remove('hidden');
         });
-        
-        function submitQuiz() {
-            const userAnswers = questions.map(q => `Pregunta ${q.id} ("${q.question}") la respuesta es: "${q.answer}"`).join('\n');
-            const prompt = `Basado en las respuestas del usuario a las siguientes 5 preguntas, genera un informe de análisis de planificación de carrera profesional. El informe debe incluir: 1. Perspectivas clave y análisis de fortalezas de la personalidad. 2. 3 sugerencias de dirección de carrera altamente compatibles (incluyendo título del puesto, por qué es adecuado y la trayectoria de desarrollo). 3. Un plan de acción ejecutable de próximos pasos. Usa un tono de mentor amigable y profesional. Las respuestas del usuario son:\n${userAnswers}`;
-            
-            // Bypassing Turnstile
-            const messages = [{ role: 'user', content: prompt }];
-            fetchReport(messages);
-        }
 
-        function fetchReport(messages) {
-            showLoadingState();
-
-            // The payload no longer includes the turnstile token.
-            const payload = {
-                model: 'openai/gpt-4o',
-                messages: messages,
-                stream: true
-            };
-
-            streamChat(payload);
-        }
-
-        function sendFollowUp() {
-            const userInput = chatInput.value.trim();
-            if (!userInput) return;
-
-            addMessageToHistory('user', userInput);
-            chatInput.value = '';
-
-            // Bypassing Turnstile for follow-up
-            const currentHistory = [...chatHistory];
-            currentHistory.push({ role: 'user', content: userInput });
-            const payload = {
-                model: 'openai/gpt-4o',
-                messages: currentHistory,
-                stream: true
-            };
-            streamChat(payload);
-        }
-
-        async function streamChat(payload) {
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`La llamada a la API falló: ${response.status}. ${await response.text()}`);
-                }
-
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let buffer = '';
-                let botMessageContent = '';
-                
-                const botMessageContainer = document.createElement('div');
-                botMessageContainer.className = "flex justify-start mb-3";
-                botMessageContainer.innerHTML = `<div class="bg-gray-100 rounded-lg py-2 px-4 max-w-lg prose"></div>`;
-                chatHistory.appendChild(botMessageContainer);
-                const contentElement = botMessageContainer.querySelector('div');
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop(); 
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const content = line.substring(6);
-                            if (content === '[DONE]') continue;
-                            try {
-                                const chunk = JSON.parse(content);
-                                if (chunk.choices[0].delta.content) {
-                                    botMessageContent += chunk.choices[0].delta.content;
-                                    contentElement.innerHTML = markdownConverter.makeHtml(botMessageContent);
-                                    chatHistory.scrollTop = chatHistory.scrollHeight;
-                                }
-                            } catch (e) { console.error('Error al analizar el fragmento del stream:', e); }
-                        }
-                    }
-                }
-                conversationHistory.push({ role: "assistant", content: botMessageContent });
-            } catch (error) {
-                const errorElement = document.createElement('div');
-                errorElement.className = 'text-red-500';
-                errorElement.textContent = `Lo sentimos, ocurrió un error: ${error.message}`;
-                chatHistory.appendChild(errorElement);
-            } finally {
-                chatInput.disabled = false;
-                sendBtn.disabled = false;
-                chatInput.focus();
+        directInputSubmitBtn.addEventListener('click', () => {
+            const userInput = directInputText.value;
+            if (userInput.trim().length < 10) {
+                alert('Para un análisis más preciso, por favor ingresa al menos 10 caracteres.');
+                return;
             }
-        }
+            const prompt = createDirectInputPrompt(userInput);
+            triggerAnalysis(prompt);
+        });
+
+        sendBtn.addEventListener('click', handleSendMessage);
+        chatInput.addEventListener('keypress', (e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage()));
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', renderQuestion);
+
     </script>
 </body>
 </html>
